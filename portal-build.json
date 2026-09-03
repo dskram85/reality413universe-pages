@@ -1,0 +1,11 @@
+{
+  "schema": 3,
+  "sequence": 1,
+  "version": "0.00.001",
+  "updatedAt": "2026-09-03T11:17:37.156Z",
+  "source": {
+    "sha": "b431d153857c7ce661155615f2a59121bed1952c",
+    "subject": "docs(contracts): add pilot background agreement",
+    "branch": "feat/archive-sidebar-layout"
+  }
+}

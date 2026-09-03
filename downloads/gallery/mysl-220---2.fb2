@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <genre>sf_cyberpunk</genre>
+      <author><nickname>Николас Опиум</nickname></author>
+      <book-title>Когда-то давным давно...</book-title>
+      <annotation><p>... в другой галактике. Нет, это не та история. Есть у меня персонаж. Неплохо так вписывается в Реальность. Но есть какая-то неуверенность в том, стоит ли описывать его похождения. Или…</p></annotation>
+      <date value="2012-11-27">2012-11-27</date>
+      <lang>ru</lang>
+    </title-info>
+    <document-info>
+      <author><nickname>Вселенная Реальность 4.13</nickname></author>
+      <program-used>reality413portal community importer</program-used>
+      <date value="2026-08-08">2026-08-08</date>
+      <src-url>https://www.reality413.com/index.php/thinking/220---2</src-url>
+      <id>reality413-community-mysl-220---2</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <title><p>Когда-то давным давно...</p></title>
+    <section>
+      <p>... в другой галактике.</p>
+      <p>Нет, это не та история.</p>
+      <p>Есть у меня персонаж. Неплохо так вписывается в Реальность. Но есть какая-то неуверенность в том, стоит ли описывать его похождения. Или оставить...</p>
+      <p>Может, найдётся кто, кто мне дружеский пинок даст?</p>
+    </section>
+  </body>
+</FictionBook>

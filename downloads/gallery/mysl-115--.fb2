@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <genre>sf_cyberpunk</genre>
+      <author><nickname>Виталий Шутов</nickname></author>
+      <book-title>переезд сайта</book-title>
+      <annotation><p>думаю в понедельник сайт переедет на основную площадку, старый сайт останется доступен он добавлением /old в адресной строке. Материалы с форумов старого сайта буду переносить постепенно.…</p></annotation>
+      <date value="2012-04-12">2012-04-12</date>
+      <lang>ru</lang>
+    </title-info>
+    <document-info>
+      <author><nickname>Вселенная Реальность 4.13</nickname></author>
+      <program-used>reality413portal community importer</program-used>
+      <date value="2026-08-08">2026-08-08</date>
+      <src-url>https://www.reality413.com/index.php/thinking/115--</src-url>
+      <id>reality413-community-mysl-115--</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <title><p>переезд сайта</p></title>
+    <section>
+      <p>думаю в понедельник сайт переедет на основную площадку, старый сайт останется доступен он добавлением /old в адресной строке. Материалы с форумов старого сайта буду переносить постепенно. Если кто-то считает что какие-то материалы надо в первую очередь перенести. или вообще разместить в официальных ссылках, напишите мне.</p>
+    </section>
+  </body>
+</FictionBook>

@@ -1,0 +1,1525 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc="" data-has-sidebar="" class="astro-vdxcvpsm"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Термосканер | Реальность 4.13</title><link rel="sitemap" href="/reality413universe-pages/sitemap-index.xml"><link rel="shortcut icon" href="/reality413universe-pages/favicon.svg" type="image/svg+xml"><meta name="generator" content="Astro v7.2.0"><meta name="generator" content="Starlight v0.41.7"><meta property="og:title" content="Термосканер"><meta property="og:type" content="article"><meta property="og:url" content="https://dskram85.github.io/reality413universe-pages/wiki/games/cops-2170-police-stories/equipment_other/termoscanner/"><meta property="og:locale" content="en"><meta property="og:description" content="Временная копия Wiki игры «Код доступа: РАЙ Ремастер» для макета раздела «Власть Закона: Полицейские истории»."><meta property="og:site_name" content="Реальность 4.13"><meta name="twitter:card" content="summary_large_image"><meta name="description" content="Временная копия Wiki игры «Код доступа: РАЙ Ремастер» для макета раздела «Власть Закона: Полицейские истории»."><script>(function(){const registry = "{\"defaultTheme\":\"default\",\"storageKey\":\"reality413-theme\",\"sourcePriorities\":{\"base\":0,\"context\":100,\"manual\":200,\"music\":300},\"themes\":[{\"id\":\"default\",\"labels\":{\"ru\":\"Обычное оформление\",\"en\":\"Default\"},\"danceProfile\":\"default\",\"activationDelay\":0,\"releaseDelay\":0,\"transitionDuration\":0,\"priority\":0},{\"id\":\"punk-zone-05\",\"labels\":{\"ru\":\"Punk Zone 05\",\"en\":\"Punk Zone 05\"},\"danceProfile\":\"punk-zone-05\",\"activationDelay\":0,\"releaseDelay\":0,\"transitionDuration\":0,\"priority\":100},{\"id\":\"paradise-cracked-menu\",\"labels\":{\"ru\":\"Paradise Cracked Menu\",\"en\":\"Paradise Cracked Menu\"},\"danceProfile\":\"default\",\"activationDelay\":0,\"releaseDelay\":0,\"transitionDuration\":180,\"priority\":50}]}";
+const developmentTheme = "";
+
+  (() => {
+    const config = JSON.parse(registry);
+    const ids = config.themes.map(({ id }) => id);
+    let saved = '';
+    try { saved = localStorage.getItem(config.storageKey) || ''; } catch {}
+    const theme = ids.includes(developmentTheme)
+      ? developmentTheme
+      : ids.includes(saved) ? saved : config.defaultTheme;
+    document.documentElement.dataset.portalTheme = theme;
+    document.documentElement.dataset.portalThemeState = theme === config.defaultTheme
+      || document.documentElement.dataset.developmentBackgroundMode === 'composition'
+      ? 'inactive'
+      : 'active';
+  })();
+})();</script><script>(function(){const registry = "{\"defaultTheme\":\"default\",\"storageKey\":\"reality413-theme\",\"sourcePriorities\":{\"base\":0,\"context\":100,\"manual\":200,\"music\":300},\"themes\":[{\"id\":\"default\",\"labels\":{\"ru\":\"Обычное оформление\",\"en\":\"Default\"},\"danceProfile\":\"default\",\"activationDelay\":0,\"releaseDelay\":0,\"transitionDuration\":0,\"priority\":0},{\"id\":\"punk-zone-05\",\"labels\":{\"ru\":\"Punk Zone 05\",\"en\":\"Punk Zone 05\"},\"danceProfile\":\"punk-zone-05\",\"activationDelay\":0,\"releaseDelay\":0,\"transitionDuration\":0,\"priority\":100},{\"id\":\"paradise-cracked-menu\",\"labels\":{\"ru\":\"Paradise Cracked Menu\",\"en\":\"Paradise Cracked Menu\"},\"danceProfile\":\"default\",\"activationDelay\":0,\"releaseDelay\":0,\"transitionDuration\":180,\"priority\":50}]}";
+const developmentTheme = "";
+
+  (() => {
+    const config = JSON.parse(registry);
+    const definitions = new Map(config.themes.map((theme) => [theme.id, theme]));
+    if (!definitions.has(config.defaultTheme)) return;
+
+    const runtimeVersion = 8;
+    const existing = window.__reality413ThemeManager;
+    if (existing) {
+      if (existing.version === runtimeVersion) {
+        existing.sync();
+        return;
+      }
+      if (typeof existing.destroy !== 'function') {
+        window.location.reload();
+        return;
+      }
+      existing.destroy();
+    }
+
+    const root = document.documentElement;
+    const sources = new Map();
+    const sourcePriorities = config.sourcePriorities || {};
+    let sourceSequence = 0;
+    let resolveTimer;
+    let introTimer;
+    let introExitTimer;
+    let activeIntro;
+    let storedManualTheme = definitions.has(developmentTheme) ? developmentTheme : '';
+    if (!storedManualTheme) {
+      try { storedManualTheme = localStorage.getItem(config.storageKey) || ''; } catch {}
+    }
+    let hasExplicitManualTheme = definitions.has(storedManualTheme);
+    let manualTheme = hasExplicitManualTheme ? storedManualTheme : root.dataset.portalTheme || config.defaultTheme;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const definition = (id) => definitions.get(id) || definitions.get(config.defaultTheme);
+    const themeState = (id, targetRoot = root) => id === config.defaultTheme
+      || targetRoot.dataset.developmentBackgroundMode === 'composition'
+      ? 'inactive'
+      : 'active';
+    const setTransitionDuration = (id) => {
+      const duration = reducedMotion.matches ? 0 : definition(id).transitionDuration || 0;
+      root.style.setProperty('--portal-theme-transition-duration', `${duration}ms`);
+    };
+    const preferredTheme = () => [
+      {
+        theme: manualTheme,
+        priority: hasExplicitManualTheme
+          ? Number(sourcePriorities.manual) || 0
+          : Number(sourcePriorities.base) || 0,
+        themePriority: definition(manualTheme).priority || 0,
+        sequence: -1,
+      },
+      ...[...sources.values()].filter(({ theme }) => definitions.has(theme)),
+    ].sort((left, right) => (
+      (right.priority - left.priority)
+      || (right.themePriority - left.themePriority)
+      || (right.sequence - left.sequence)
+    ))[0].theme;
+    const announce = () => document.dispatchEvent(new CustomEvent('portal:theme-change', {
+      detail: { theme: root.dataset.portalTheme, manualTheme, transient: sources.size > 0 },
+    }));
+    const resetIntro = () => {
+      window.clearTimeout(introTimer);
+      window.clearTimeout(introExitTimer);
+      delete root.dataset.portalThemeIntro;
+      delete root.dataset.portalThemeIntroExit;
+      delete root.dataset.portalThemeIntroEffect;
+      root.style.removeProperty('--portal-theme-intro-duration');
+      root.style.removeProperty('--portal-theme-intro-exit-duration');
+      root.style.removeProperty('--portal-theme-intro-opacity');
+      activeIntro = undefined;
+    };
+    const cancelIntro = (smooth = false) => {
+      const opacity = smooth && root.dataset.portalThemeIntro
+        ? Number.parseFloat(window.getComputedStyle(root, '::after').opacity) || 0
+        : 0;
+      const intro = activeIntro;
+      delete root.dataset.portalThemeIntro;
+      delete root.dataset.portalThemeIntroExit;
+      if (!intro || opacity <= 0) {
+        resetIntro();
+        return;
+      }
+      const exitDuration = intro.exitDuration || 0;
+      root.style.setProperty('--portal-theme-intro-opacity', String(opacity));
+      root.style.setProperty('--portal-theme-intro-exit-duration', `${exitDuration}ms`);
+      root.dataset.portalThemeIntroExit = 'true';
+      introExitTimer = window.setTimeout(() => {
+        resetIntro();
+      }, exitDuration + 60);
+    };
+    const runIntro = (theme) => {
+      const intro = definition(theme).intro;
+      if (reducedMotion.matches || !intro?.effect || !intro.duration) return;
+      cancelIntro();
+      activeIntro = intro;
+      root.style.setProperty('--portal-theme-intro-duration', `${intro.duration}ms`);
+      root.dataset.portalThemeIntroEffect = intro.effect;
+      window.getComputedStyle(root).opacity;
+      root.dataset.portalThemeIntro = 'active';
+      introTimer = window.setTimeout(() => {
+        resetIntro();
+      }, intro.duration + 60);
+    };
+    const apply = (target) => {
+      window.clearTimeout(resolveTimer);
+      const current = root.dataset.portalTheme || config.defaultTheme;
+      if (current === target) {
+        root.dataset.portalTheme = target;
+        root.dataset.portalThemeState = themeState(target);
+        announce();
+        return;
+      }
+      setTransitionDuration(target === config.defaultTheme ? current : target);
+      root.dataset.portalTheme = target;
+      root.dataset.portalThemeState = themeState(target);
+      announce();
+    };
+    const resolve = () => apply(preferredTheme());
+    const scheduleResolve = (delay = 0) => {
+      window.clearTimeout(resolveTimer);
+      if (delay <= 0) {
+        resolve();
+        return;
+      }
+      resolveTimer = window.setTimeout(resolve, delay);
+    };
+    const setManual = (theme) => {
+      if (!definitions.has(theme)) return;
+      manualTheme = theme;
+      hasExplicitManualTheme = true;
+      try { localStorage.setItem(config.storageKey, theme); } catch {}
+      scheduleResolve();
+    };
+    const setSource = ({ source, kind = 'context', theme, active, intro = false, priority }) => {
+      if (!source) return;
+      window.clearTimeout(resolveTimer);
+      if (active && definitions.has(theme)) {
+        if (intro) runIntro(theme);
+        const configuredPriority = Number(sourcePriorities[kind]) || 0;
+        const requestedPriority = Number(priority);
+        sources.set(source, {
+          theme,
+          kind,
+          priority: Number.isFinite(requestedPriority) ? requestedPriority : configuredPriority,
+          themePriority: definition(theme).priority || 0,
+          sequence: sourceSequence += 1,
+        });
+        const introDefinition = definition(theme).intro;
+        const delay = intro && !reducedMotion.matches
+          ? introDefinition?.activationDelay ?? definition(theme).activationDelay ?? 0
+          : definition(theme).activationDelay || 0;
+        scheduleResolve(delay);
+        return;
+      }
+      cancelIntro(true);
+      const previous = sources.get(source);
+      sources.delete(source);
+      const delay = previous ? definition(previous.theme).releaseDelay || 0 : 0;
+      scheduleResolve(delay);
+    };
+    const sync = () => {
+      resolve();
+    };
+
+    const onSetTheme = (event) => setManual(event.detail?.theme);
+    const onThemeSource = (event) => setSource(event.detail || {});
+    const onBeforeSwap = (event) => {
+      const targetRoot = event.newDocument?.documentElement;
+      if (!targetRoot) return;
+      const target = preferredTheme();
+      targetRoot.dataset.portalTheme = target;
+      targetRoot.dataset.portalThemeState = themeState(target,targetRoot);
+    };
+    const onPageLoad = () => {
+      sync();
+      requestAnimationFrame(sync);
+    };
+    const onDevelopmentBackgroundChange = () => sync();
+    const destroy = () => {
+      window.clearTimeout(resolveTimer);
+      window.clearTimeout(introTimer);
+      window.clearTimeout(introExitTimer);
+      document.removeEventListener('portal:set-theme', onSetTheme);
+      document.removeEventListener('portal:theme-source', onThemeSource);
+      document.removeEventListener('astro:before-swap', onBeforeSwap);
+      document.removeEventListener('astro:after-swap', sync);
+      document.removeEventListener('astro:page-load', onPageLoad);
+      document.removeEventListener('portal:development-background-change', onDevelopmentBackgroundChange);
+    };
+
+    document.addEventListener('portal:set-theme', onSetTheme);
+    document.addEventListener('portal:theme-source', onThemeSource);
+    document.addEventListener('astro:before-swap', onBeforeSwap);
+    document.addEventListener('astro:after-swap', sync);
+    document.addEventListener('astro:page-load', onPageLoad);
+    document.addEventListener('portal:development-background-change', onDevelopmentBackgroundChange);
+    window.__reality413ThemeManager = { version: runtimeVersion, sync, setManual, setSource, destroy };
+    sync();
+  })();
+})();</script><script>(function(){const registry = "{\"storageKey\":\"reality413-content-view\",\"defaultView\":\"list\",\"views\":[{\"id\":\"list\",\"label\":\"Список\"}]}";
+
+  (() => {
+    const config = JSON.parse(registry);
+    const ids = config.views.map(({ id }) => id);
+    let saved = '';
+    try { saved = localStorage.getItem(config.storageKey) || ''; } catch {}
+    document.documentElement.dataset.portalContentView = ids.includes(saved) ? saved : config.defaultView;
+  })();
+})();</script><script>(function(){const registry = "{\"storageKey\":\"reality413-content-view\",\"defaultView\":\"list\",\"views\":[{\"id\":\"list\",\"label\":\"Список\"}]}";
+
+  (() => {
+    const config = JSON.parse(registry);
+    const ids = new Set(config.views.map(({ id }) => id));
+    if (!ids.has(config.defaultView)) return;
+
+    const runtimeVersion = 8;
+    const existing = window.__reality413ContentViewManager;
+    if (existing) {
+      if (existing.version === runtimeVersion) {
+        existing.sync();
+        return;
+      }
+      existing.destroy?.();
+    }
+
+    const read = () => {
+      let saved = '';
+      try { saved = localStorage.getItem(config.storageKey) || ''; } catch {}
+      return ids.has(saved) ? saved : config.defaultView;
+    };
+    const desktopList = window.matchMedia('(min-width: 1181px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const settleDelay = 24;
+    let userScrollSession = false;
+    let scrollObservedSinceInput = false;
+    let snapInProgress = false;
+    let snapAnimationFrame = 0;
+    let scrollDirection = 0;
+    let scrollVelocity = 0;
+    let lastScrollY = window.scrollY;
+    let lastScrollAt = performance.now();
+    let lastInputAt = 0;
+    let scrollIdleTimer = 0;
+
+    const stopSnapAnimation = () => {
+      if (snapAnimationFrame) cancelAnimationFrame(snapAnimationFrame);
+      snapAnimationFrame = 0;
+      snapInProgress = false;
+    };
+    const finishScrollSession = () => {
+      window.clearTimeout(scrollIdleTimer);
+      stopSnapAnimation();
+      userScrollSession = false;
+      scrollObservedSinceInput = false;
+      scrollDirection = 0;
+      scrollVelocity = 0;
+      lastScrollY = window.scrollY;
+      lastScrollAt = performance.now();
+    };
+    const beginUserScrollSession = () => {
+      const now = performance.now();
+      const continuedGesture = now - lastInputAt < 260;
+      window.clearTimeout(scrollIdleTimer);
+      stopSnapAnimation();
+      userScrollSession = true;
+      scrollObservedSinceInput = false;
+      if (!continuedGesture) {
+        scrollDirection = 0;
+        scrollVelocity = 0;
+      }
+      lastInputAt = now;
+      lastScrollY = window.scrollY;
+      lastScrollAt = now;
+    };
+    const animateTo = (target) => {
+      const start = window.scrollY;
+      const distance = target - start;
+      if (Math.abs(distance) < 1 || reducedMotion.matches) {
+        window.scrollTo(0, target);
+        finishScrollSession();
+        return;
+      }
+
+      const startedAt = performance.now();
+      const incomingSpeed = Math.max(.7, Math.abs(scrollVelocity));
+      const duration = Math.min(320, Math.max(120, (Math.abs(distance) * 2) / incomingSpeed));
+      snapInProgress = true;
+
+      const step = (now) => {
+        if (!snapInProgress) return;
+        const progress = Math.min(1, (now - startedAt) / duration);
+        const eased = 1 - Math.pow(1 - progress, 2);
+        window.scrollTo(0, start + distance * eased);
+        if (progress < 1) {
+          snapAnimationFrame = requestAnimationFrame(step);
+          return;
+        }
+        finishScrollSession();
+      };
+
+      snapAnimationFrame = requestAnimationFrame(step);
+    };
+    const continueListInertiaToSlot = () => {
+      if (!userScrollSession || !desktopList.matches || document.documentElement.dataset.portalContentView !== 'list') {
+        finishScrollSession();
+        return;
+      }
+
+      const routeGuide = document.querySelector('[data-portal-content-stop-guide]');
+      const guide = routeGuide?.getClientRects().length
+        ? routeGuide
+        : document.querySelector('.portal-content-start-guide');
+      const cards = Array.from(document.querySelectorAll('.content-card'))
+        .filter((card) => card.offsetParent !== null);
+      if (!guide || cards.length < 2 || scrollDirection === 0) {
+        finishScrollSession();
+        return;
+      }
+
+      const guideTop = guide.getBoundingClientRect().top;
+      const bounds = cards.map((card) => card.getBoundingClientRect());
+      const targets = bounds.map((cardBounds) => window.scrollY + cardBounds.top - guideTop);
+      const current = window.scrollY;
+      const list = cards[0].closest('.content-list');
+      const gap = list ? Number.parseFloat(getComputedStyle(list).rowGap) || 0 : 0;
+      const slotDistance = bounds[0].height + gap;
+      if (current < targets[0] - slotDistance / 2 || current > targets.at(-1) + slotDistance / 2) {
+        finishScrollSession();
+        return;
+      }
+
+      const exact = targets.find((target) => Math.abs(target - current) < 1);
+      const directional = scrollDirection > 0
+        ? targets.find((target) => target > current + 1)
+        : targets.findLast((target) => target < current - 1);
+      const target = exact ?? directional;
+      if (target === undefined) {
+        finishScrollSession();
+        return;
+      }
+      const maximum = document.documentElement.scrollHeight - window.innerHeight;
+      animateTo(Math.min(maximum, Math.max(0, target)));
+    };
+    const scheduleInertialAlignment = () => {
+      if (!userScrollSession || !scrollObservedSinceInput || snapInProgress) return;
+      window.clearTimeout(scrollIdleTimer);
+      scrollIdleTimer = window.setTimeout(continueListInertiaToSlot, settleDelay);
+    };
+    const onScroll = () => {
+      if (!snapInProgress) {
+        if (userScrollSession) scrollObservedSinceInput = true;
+        const now = performance.now();
+        const delta = window.scrollY - lastScrollY;
+        if (Math.abs(delta) > .5) {
+          scrollDirection = Math.sign(delta);
+          const elapsed = Math.max(8, now - lastScrollAt);
+          const instantVelocity = Math.max(-3, Math.min(3, delta / elapsed));
+          scrollVelocity = scrollVelocity * .65 + instantVelocity * .35;
+        }
+        lastScrollAt = now;
+      }
+      lastScrollY = window.scrollY;
+      scheduleInertialAlignment();
+    };
+    const onScrollEnd = () => {
+      if (!scrollObservedSinceInput || snapInProgress) return;
+      window.clearTimeout(scrollIdleTimer);
+      continueListInertiaToSlot();
+    };
+    const onScrollKey = (event) => {
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) {
+        beginUserScrollSession();
+      }
+    };
+    const onWheel = (event) => {
+      beginUserScrollSession();
+      if (Math.abs(event.deltaY) < .5) return;
+      scrollDirection = Math.sign(event.deltaY);
+      const wheelVelocity = Math.max(-3, Math.min(3, event.deltaY / 16));
+      scrollVelocity = scrollVelocity * .5 + wheelVelocity * .5;
+    };
+    const onPointerDown = (event) => {
+      if (snapInProgress || event.pointerType === 'touch') beginUserScrollSession();
+    };
+    const syncButtons = (view) => {
+      document.querySelectorAll('[data-portal-content-view-option]').forEach((button) => {
+        const active = button.dataset.portalContentViewOption === view;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    };
+    const apply = (view, persist = false) => {
+      const next = ids.has(view) ? view : config.defaultView;
+      document.documentElement.dataset.portalContentView = next;
+      if (persist) {
+        try { localStorage.setItem(config.storageKey, next); } catch {}
+      }
+      syncButtons(next);
+      document.dispatchEvent(new CustomEvent('portal:content-view-change', { detail: { view: next } }));
+    };
+    const sync = () => apply(read());
+    const onClick = (event) => {
+      const button = event.target.closest?.('[data-portal-content-view-option]');
+      if (!button) return;
+      apply(button.dataset.portalContentViewOption, true);
+    };
+    const onBeforeSwap = (event) => {
+      const targetRoot = event.newDocument?.documentElement;
+      if (targetRoot) targetRoot.dataset.portalContentView = read();
+    };
+    const destroy = () => {
+      window.clearTimeout(scrollIdleTimer);
+      stopSnapAnimation();
+      document.removeEventListener('click', onClick);
+      document.removeEventListener('astro:before-swap', onBeforeSwap);
+      document.removeEventListener('astro:page-load', sync);
+      document.removeEventListener('keydown', onScrollKey);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scrollend', onScrollEnd);
+    };
+
+    document.addEventListener('click', onClick);
+    document.addEventListener('astro:before-swap', onBeforeSwap);
+    document.addEventListener('astro:page-load', sync);
+    document.addEventListener('keydown', onScrollKey);
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scrollend', onScrollEnd, { passive: true });
+    window.__reality413ContentViewManager = { version: runtimeVersion, sync, apply, destroy };
+    sync();
+  })();
+})();</script><script>
+  (() => {
+    const runtimeVersion = 6;
+    const existing = window.__reality413ContentClipRuntime;
+    if (existing) {
+      if (existing.version === runtimeVersion) {
+        existing.sync();
+        return;
+      }
+      existing.destroy?.();
+    }
+
+    const surfaceSelector = [
+      '.section-page > :not(.site-header):not(script):not(style)',
+      '.page > .sidebar',
+      '.page > .main-frame',
+      '[data-portal-content-clip-surface]',
+    ].join(',');
+    let surfaces = [];
+    let frame = 0;
+    let headerLayoutObserver;
+
+    const collect = () => {
+      document.querySelectorAll('[data-portal-content-clip]').forEach((surface) => {
+        surface.removeAttribute('data-portal-content-clip');
+        surface.style.removeProperty('--portal-content-clip-top');
+      });
+      surfaces = [...document.querySelectorAll(surfaceSelector)]
+        .filter((surface) => !surface.hasAttribute('data-portal-content-clip-exempt'));
+      surfaces.forEach((surface) => surface.setAttribute('data-portal-content-clip', ''));
+    };
+
+    const update = () => {
+      frame = 0;
+      const routeGuide = document.querySelector('[data-portal-content-stop-guide]');
+      const guide = routeGuide?.getClientRects().length
+        ? routeGuide
+        : document.querySelector('.portal-content-start-guide');
+      if (!guide) return;
+      const contentStart = guide.getBoundingClientRect().top;
+      surfaces.forEach((surface) => {
+        const bounds = surface.getBoundingClientRect();
+        const clipTop = Math.min(bounds.height, Math.max(0, contentStart - bounds.top));
+        surface.style.setProperty('--portal-content-clip-top', `${clipTop}px`);
+      });
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const sync = () => {
+      collect();
+      schedule();
+      headerLayoutObserver?.disconnect();
+      const header = document.querySelector('.site-header');
+      if (header) {
+        headerLayoutObserver = new MutationObserver(schedule);
+        headerLayoutObserver.observe(header, { attributes: true, attributeFilter: ['data-main-nav-layout'] });
+      }
+    };
+    const destroy = () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      document.removeEventListener('DOMContentLoaded', sync);
+      document.removeEventListener('astro:page-load', sync);
+      headerLayoutObserver?.disconnect();
+      document.querySelectorAll('[data-portal-content-clip]').forEach((surface) => {
+        surface.removeAttribute('data-portal-content-clip');
+        surface.style.removeProperty('--portal-content-clip-top');
+      });
+    };
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    document.addEventListener('astro:page-load', sync);
+    window.__reality413ContentClipRuntime = { version: runtimeVersion, sync, destroy };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', sync, { once: true });
+    } else {
+      sync();
+    }
+  })();
+</script><script type="module" src="/reality413universe-pages/_astro/PortalMusicReactiveRuntime.astro_astro_type_script_index_0_lang.B8Vy8cs1.js"></script><meta name="reality413-document" content="portal"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/reality413universe-pages/_astro/ClientRouter.astro_astro_type_script_index_0_lang.DWvWCZRe.js"></script><script>
+  (() => {
+    const times = ['dawn', 'morning', 'noon', 'afternoon', 'sunset', 'twilight', 'night', 'deep-night'];
+    const hour = new Date().getHours();
+    const automatic = hour >= 5 && hour < 7 ? 'dawn'
+      : hour >= 7 && hour < 10 ? 'morning'
+      : hour >= 10 && hour < 14 ? 'noon'
+      : hour >= 14 && hour < 17 ? 'afternoon'
+      : hour >= 17 && hour < 19 ? 'sunset'
+      : hour >= 19 && hour < 21 ? 'twilight'
+      : hour >= 21 || hour < 1 ? 'night'
+      : 'deep-night';
+    let saved = '';
+    try { saved = localStorage.getItem('reality413-city-time') || ''; } catch {}
+    document.documentElement.dataset.cityMode = times.includes(saved) ? 'manual' : 'auto';
+    document.documentElement.dataset.cityTime = times.includes(saved) ? saved : automatic;
+  })();
+</script><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"></path></svg><svg aria-hidden="true" class="dark astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"></path></svg><svg aria-hidden="true" class="auto astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"></path></svg></template><link rel="stylesheet" href="/reality413universe-pages/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/reality413universe-pages/_astro/common.DlOEYonj.css"><link rel="stylesheet" href="/reality413universe-pages/_astro/PortalGuideLayer.9eEsQPw_.css"><script type="module" src="/reality413universe-pages/_astro/page.BJyszQh4.js"></script><link rel="canonical" href="https://dskram85.github.io/reality413universe-pages/en/wiki/games/cops-2170-police-stories/equipment_other/termoscanner/"><link rel="alternate" hreflang="ru" href="https://dskram85.github.io/reality413universe-pages/ru/wiki/games/cops-2170-police-stories/equipment_other/termoscanner/"><link rel="alternate" hreflang="en" href="https://dskram85.github.io/reality413universe-pages/en/wiki/games/cops-2170-police-stories/equipment_other/termoscanner/"></head><body class="astro-vdxcvpsm"><a class="sl-skip-link astro-vxeigawq" href="#_top">Skip to content</a><div data-astro-transition-persist="portal-city-backdrop" class="city-backdrop" data-city-backdrop="" data-music-reactive-surface="background" aria-hidden="true"><div class="city-backdrop__frame"><div class="city-backdrop__image"></div><div class="city-backdrop__tones" data-music-target="background.tones"><i class="city-backdrop__tone city-backdrop__tone--dawn"></i><i class="city-backdrop__tone city-backdrop__tone--morning"></i><i class="city-backdrop__tone city-backdrop__tone--noon"></i><i class="city-backdrop__tone city-backdrop__tone--afternoon"></i><i class="city-backdrop__tone city-backdrop__tone--sunset"></i><i class="city-backdrop__tone city-backdrop__tone--twilight"></i><i class="city-backdrop__tone city-backdrop__tone--night"></i><i class="city-backdrop__tone city-backdrop__tone--deep-night"></i></div><audio data-city-rain-audio="" src="/reality413universe-pages/media/ambient/paradise-cracked-rain.ogg" preload="auto" loop="" hidden="" aria-hidden="true"></audio><div class="city-backdrop__source-lights" aria-hidden="true"><i class="city-backdrop__source-light city-backdrop__source-light--left-violet"></i><i class="city-backdrop__source-light city-backdrop__source-light--center-violet"></i><i class="city-backdrop__source-light city-backdrop__source-light--red-panel"></i><i class="city-backdrop__source-light city-backdrop__source-light--red-crown"></i><i class="city-backdrop__source-light city-backdrop__source-light--moon"></i></div><canvas class="city-backdrop__rain" data-city-backdrop-rain="" aria-hidden="true"></canvas></div><div class="city-backdrop__veil" data-music-target="background.veil"></div><div class="city-backdrop__header-shade"></div></div><script type="module">var e,t;function n(){let e=document.querySelector(`[data-city-rain-audio]`);if(!e)return;let t=document.querySelector(`[data-music-audio]`);e.volume=Math.min(1,t?.muted?0:(t?.volume??1)*.32),document.documentElement.dataset.cityRainAudioVolume=String(e.volume)}async function r(){let e=document.querySelector(`[data-city-rain-audio]`);if(e)try{document.documentElement.dataset.cityRainAudioState=`starting`,n(),await e.play(),document.documentElement.dataset.cityRainAudioState=e.paused?`paused`:`playing`}catch(e){document.documentElement.dataset.cityRainAudioState=`error`,console.error(`[city-rain-audio]`,e)}}function i(){t?.abort(),t=new AbortController;let{signal:e}=t,i=()=>r();window.addEventListener(`pointerdown`,i,{capture:!0,signal:e}),window.addEventListener(`click`,i,{capture:!0,signal:e}),window.addEventListener(`keydown`,i,{capture:!0,signal:e}),window.addEventListener(`touchstart`,i,{capture:!0,passive:!0,signal:e}),document.querySelector(`[data-music-audio]`)?.addEventListener(`volumechange`,n,{signal:e}),n()}function a(){e?.abort();let t=document.querySelector(`[data-city-backdrop-rain]`);if(!t)return;e=new AbortController;let{signal:n}=e,r=window.matchMedia(`(prefers-reduced-motion: reduce)`),i=t.getContext(`2d`);if(!i||r.matches){t.hidden=!0;return}t.hidden=!1;let a=0,o=0,s=[],c=0,l=performance.now();function u(e=Math.floor(Math.random()*3)){let t=[.58,.84,1.12][e];return{x:Math.random()*(a+120)-60,y:Math.random()*(o+120)-120,length:(24+Math.random()*54)*t,speed:(1120+Math.random()*980)*t,alpha:(.07+Math.random()*.19)*t,width:.45+e*.34,layer:e,warmth:Math.random()}}function d(){let e=t.getBoundingClientRect(),n=Math.min(window.devicePixelRatio||1,2);a=Math.max(1,e.width),o=Math.max(1,e.height),t.width=Math.round(a*n),t.height=Math.round(o*n),i.setTransform(n,0,0,n,0,0);let r=Math.round(Math.min(5500,Math.max(3200,a*o/240)));s=Array.from({length:r},(e,t)=>u(t%3))}function f(e){return e.warmth>.92?`rgba(226,145,132,${e.alpha*.72})`:e.warmth<.08?`rgba(190,172,215,${e.alpha*.68})`:`rgba(202,211,216,${e.alpha})`}function p(e){let t=Math.min((e-l)/1e3,.05);l=e,i.clearRect(0,0,a,o),i.lineCap=`butt`;for(let e of s)e.y+=e.speed*t,e.x+=e.speed*t*.035,(e.y-e.length>o||e.x>a+60)&&Object.assign(e,u(e.layer),{y:-e.length}),i.beginPath(),i.strokeStyle=f(e),i.lineWidth=e.width,i.moveTo(e.x,e.y),i.lineTo(e.x-e.length*.035,e.y-e.length),i.stroke();c=requestAnimationFrame(p)}let m=new ResizeObserver(d);m.observe(t),d(),c=requestAnimationFrame(p),n.addEventListener(`abort`,()=>{cancelAnimationFrame(c),m.disconnect()},{once:!0})}document.addEventListener(`astro:page-load`,a),document.addEventListener(`astro:page-load`,i),a(),i();</script><div class="page sl-flex astro-gqpr5s5a"><header class="header astro-gqpr5s5a"><header class="site-header" data-music-reactive-surface="header" data-i18n-scope="" data-supported-locales="ru,en"><nav class="brand-utility" aria-label="Support and contacts"><a class="brand-utility__link brand-utility__link--boosty" href="https://boosty.to/vpengine" target="_blank" rel="noopener noreferrer" aria-label="Support Reality 4.13 Universe on Boosty"><svg width="1em" height="1em" data-icon="simple-icons:boosty"><symbol id="ai:simple-icons:boosty" viewBox="0 0 24 24"><path fill="currentColor" d="M2.661 14.337L6.801 0h6.362L11.88 4.444l-.038.077l-3.378 11.733h3.15q-1.982 4.934-3.086 7.733c-5.816-.063-7.442-4.228-6.02-9.155M8.554 24l7.67-11.035h-3.25l2.83-7.073c4.852.508 7.137 4.33 5.791 8.952C20.16 19.81 14.344 24 8.68 24h-.127z"></path></symbol><use href="#ai:simple-icons:boosty"></use></svg><span>Boosty</span></a><a class="brand-utility__link brand-utility__link--contacts" href="mailto:reality413universe@gmail.com" aria-label="Contact Reality 4.13 Universe" title="reality413universe@gmail.com"><svg width="1em" height="1em" data-icon="simple-icons:gmail"><symbol id="ai:simple-icons:gmail" viewBox="0 0 24 24"><path fill="currentColor" d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64L12 9.548l6.545-4.91l1.528-1.145C21.69 2.28 24 3.434 24 5.457"></path></symbol><use href="#ai:simple-icons:gmail"></use></svg><span>Contacts</span></a><div class="brand-utility__release"><button class="brand-utility__version" type="button" aria-label="Release version of Paradise Cracked: Ver. 1.02.004" aria-expanded="false" disabled="" data-anniversary-toggle="">Ver. 1.02.004</button></div></nav><div class="site-header__persistent"><div class="brand-cluster"><a class="brand portal-persistent-brand" href="/reality413universe-pages/en/" aria-label="Reality 4.13 Universe — home"><svg class="brand__mark portal-persistent-brand__mark animated-reality-symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="58" height="58" aria-hidden="true"><defs><linearGradient id="header-symbol-orbit" x1="14" y1="26" x2="114" y2="99" gradientUnits="userSpaceOnUse"><stop stop-color="#647dff"></stop><stop offset=".48" stop-color="#f4f7ff"></stop><stop offset="1" stop-color="#9d58ff"></stop></linearGradient><linearGradient id="header-symbol-crystal" x1="50" y1="34" x2="77" y2="111" gradientUnits="userSpaceOnUse"><stop stop-color="#fff"></stop><stop offset=".22" stop-color="#b9d5ff"></stop><stop offset=".56" stop-color="#6179ec"></stop><stop offset="1" stop-color="#332a8d"></stop></linearGradient><linearGradient id="header-symbol-left" x1="48" y1="45" x2="63" y2="108" gradientUnits="userSpaceOnUse"><stop stop-color="#eef6ff"></stop><stop offset=".48" stop-color="#647bdd"></stop><stop offset="1" stop-color="#231a71"></stop></linearGradient><linearGradient id="header-symbol-right" x1="80" y1="44" x2="64" y2="108" gradientUnits="userSpaceOnUse"><stop stop-color="#d8e4ff"></stop><stop offset=".45" stop-color="#765dd5"></stop><stop offset="1" stop-color="#3b238a"></stop></linearGradient><radialGradient id="header-symbol-core"><stop stop-color="#fff"></stop><stop offset=".24" stop-color="#dff1ff"></stop><stop offset=".62" stop-color="#7fa3ff" stop-opacity=".72"></stop><stop offset="1" stop-color="#7f5cff" stop-opacity="0"></stop></radialGradient><filter id="header-symbol-glow" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="2.6" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><g data-music-target="header.brand.orbits" data-music-instance-phase="0" fill="none" stroke="url(#header-symbol-orbit)" stroke-linecap="round"><ellipse cx="64" cy="58" rx="51" ry="18" stroke-width="2.1" transform="rotate(-8 64 58)"></ellipse><ellipse cx="64" cy="58" rx="49" ry="17" stroke-width="1.75" transform="rotate(57 64 58)"></ellipse><ellipse cx="64" cy="58" rx="48" ry="16" stroke-width="1.55" transform="rotate(116 64 58)"></ellipse></g><g class="brand__native-orbit brand__native-orbit--one" data-music-target="header.brand.orbits" data-music-instance-phase="0.333" transform="rotate(-8 64 58) translate(64 58) scale(1 .352941)"><g class="brand__native-spinner brand__native-spinner--one" filter="url(#header-symbol-glow)"><circle cx="51" cy="0" r="3" fill="#92a8ff" transform="scale(1 2.83333)"></circle><circle cx="-51" cy="0" r="3" fill="#f7f9ff" transform="scale(1 2.83333)"></circle></g></g><g class="brand__native-orbit brand__native-orbit--two" data-music-target="header.brand.orbits" data-music-instance-phase="0.666" transform="rotate(57 64 58) translate(64 58) scale(1 .346939)"><g class="brand__native-spinner brand__native-spinner--two" filter="url(#header-symbol-glow)"><circle cx="49" cy="0" r="2.7" fill="#9f70ff" transform="scale(1 2.88235)"></circle><circle cx="-49" cy="0" r="2.7" fill="#d7e6ff" transform="scale(1 2.88235)"></circle></g></g><g data-music-target="header.brand.crystal" data-music-instance-phase="0.5"><circle class="brand__native-core" cx="64" cy="57" r="22" fill="url(#header-symbol-core)" opacity=".72" filter="url(#header-symbol-glow)"></circle></g><g data-music-target="header.brand.crystal" data-music-instance-phase="0"><g class="brand__native-crystal" stroke="#dce8ff" stroke-linejoin="round" stroke-width="1.15" filter="url(#header-symbol-glow)"><path d="M64 31 81 50 74 76 64 113 53 76 47 50Z" fill="url(#header-symbol-crystal)"></path><path d="M64 31 64 62 47 50Z" fill="#f4f8ff" fill-opacity=".88"></path><path d="M64 31 81 50 64 62Z" fill="#a8baff" fill-opacity=".9"></path><path d="M47 50 64 62 53 76Z" fill="url(#header-symbol-left)"></path><path d="M81 50 74 76 64 62Z" fill="url(#header-symbol-right)"></path><path d="M53 76 64 62 64 113Z" fill="#5268cb"></path><path d="M74 76 64 113 64 62Z" fill="#392578"></path></g></g><g fill="#fff" filter="url(#header-symbol-glow)"><circle cx="64" cy="56" r="3.6"></circle><circle cx="69" cy="47" r="1.4"></circle><circle cx="57" cy="66" r="1.2"></circle></g></svg><span class="brand__wordmark"><svg class="brand__wordmark-art" viewBox="0 0 251.84 48" width="251.84" height="48" aria-hidden="true" focusable="false"><g class="brand__wordmark-universe-motion" data-music-target="header.brand.wordmark-universe"><g class="brand__wordmark-universe" transform="translate(-2 0) scale(2 2)" fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="square" stroke-linejoin="miter" opacity=".82"><path d="M2 1v4l1 1h3l1-1V1"></path><path transform="translate(1 0)" d="M10 6V1l5 5V1"></path><path transform="translate(2 0)" d="M18 1v5"></path><path transform="translate(3 0)" d="m21 1 2 5h1l2-5"></path><path transform="translate(4 0)" d="M34 1h-5v5h5M29 3.5h4"></path><path transform="translate(5 0)" d="M37 6V1h4l1 1v1l-1 1h-4m3 0 2 2"></path><path transform="translate(6 0)" d="M50 1h-4l-1 1v1l1 1h3l1 1v1h-5"></path><path transform="translate(7 0)" d="M58 1h-5v5h5M53 3.5h4"></path></g></g><g class="brand__wordmark-strokes" transform="translate(0 14)" fill="none" stroke="currentColor" stroke-width="2.35" stroke-linecap="square" stroke-linejoin="miter"><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0" d="M2 32V4h14l5 5v7l-5 4H2m11 0 9 12"></path><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0.14" transform="translate(3 0)" d="M43 4H27v28h16M27 18h13"></path><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0.28" transform="translate(6 0)" d="m48 32 9-28h5l9 28M52 21h15"></path><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0.42" transform="translate(9 0)" d="M77 4v28h16"></path><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0.56" transform="translate(12 0)" d="M99 4v28"></path><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0.70" transform="translate(15 0)" d="M105 4h20m-10 0v28"></path><path data-music-target="header.brand.wordmark-reality" data-music-instance-phase="0.84" transform="translate(18 0)" d="m130 4 9 13 9-13m-9 13v15"></path><path data-music-target="header.brand.wordmark-digits" data-music-instance-phase="0" transform="translate(23 0)" d="M174 32V4l-17 20h22m-22 0h22"></path><g class="brand__wordmark-shifting-digit" data-music-target="header.brand.wordmark-digits" data-music-instance-phase="0.5" transform="translate(25.56 0)"><path class="brand__wordmark-digit-one" d="M197 4v28m-7-23 7-5m-7 28h14"></path><path class="brand__wordmark-digit-two" d="M190 9l5-5h5l4 4v7l-14 17h14"></path></g><path data-music-target="header.brand.wordmark-digits" data-music-instance-phase="0" transform="translate(26.84 0)" d="M208 4h11l4 4v7l-4 3h-8m8 0 4 3v7l-4 4h-11"></path></g><rect class="brand__wordmark-dot" x="207.28" y="43" width="3" height="3" fill="currentColor"></rect></svg></span></a><a class="brand-pantheon" href="/reality413universe-pages/en/archive/pantheon-realnosti/" aria-label="Pantheon of Reality"><svg class="brand-pantheon__label" data-music-target="header.brand.pantheon" viewBox="0 0 50 9" aria-hidden="true"><text x="25" y="7.6" text-anchor="middle" textLength="48" lengthAdjust="spacingAndGlyphs">PANTHEON</text></svg><svg class="brand-pantheon__crown" data-music-target="header.brand.crown" viewBox="0 0 46 12" aria-hidden="true"><path d="M5 3.2 14.7 6 23 1.3 31.3 6 41 3.2 37.8 9.4H8.2Z"></path><path d="M9 10.7h28"></path><circle cx="5" cy="2.8" r="1.1"></circle><circle cx="23" cy="1.2" r="1.1"></circle><circle cx="41" cy="2.8" r="1.1"></circle></svg></a><aside data-astro-transition-persist="portal-music-player" class="portal-music" data-portal-music="" data-music-soundtrack-order-key="reality413-music-soundtrack-order" data-i18n-scope=""><div class="portal-music__panel is-visible" id="portal-music-panel" aria-hidden="false" data-music-panel=""><div class="portal-music__geometry portal-system-frame-host" aria-hidden="true"><span class="portal-system-frame"></span><i class="portal-system-divider" style="--portal-system-row-boundary:1" data-portal-system-boundary="playerRow1End"></i><i class="portal-system-divider" style="--portal-system-row-boundary:2" data-portal-system-boundary="playerRow2End"></i></div><audio preload="metadata" data-music-audio="">Your browser does not support OGG playback.</audio><div class="portal-music__transport" aria-label="Playback controls"><button class="portal-music__play" type="button" aria-label="Play" data-music-play=""><i data-music-target="header.nav.player-glyphs" data-music-instance-phase="0" aria-hidden="true"></i></button><div class="portal-music__timeline"><div><time data-music-current="">0:00</time><time data-music-duration="">—:—</time></div><input type="range" min="0" max="0" step="0.01" value="0" aria-label="Track position" data-music-seek=""></div><label class="portal-music__volume"><span class="sr-only">Volume</span><input type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume" data-music-volume=""></label><button class="portal-music__mute" type="button" aria-label="Mute" data-music-mute=""><svg data-music-target="header.nav.player-glyphs" data-music-instance-phase="0.5" viewBox="0 0 24 24" aria-hidden="true"><path class="portal-music__speaker" d="M4 9h4l5-4v14l-5-4H4z"></path><path class="portal-music__sound-waves" d="M16 9c1.2 1.4 1.2 4.6 0 6M18.5 6.5c3 3.1 3 7.9 0 11"></path><path class="portal-music__mute-slash" d="M5 4l14 16"></path></svg></button></div><header class="portal-music__header"><button class="portal-music__collapse" type="button" aria-label="Collapse player" disabled="" data-music-collapse-preview=""><svg width="1em" height="1em" data-icon="lucide:panel-top-close"><symbol id="ai:lucide:panel-top-close" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18M9 16l3-3l3 3"></path></g></symbol><use href="#ai:lucide:panel-top-close"></use></svg></button><div><div class="portal-music__soundtracks" aria-label="Soundtrack selection" data-music-soundtrack-choice=""><button type="button" data-music-soundtrack="0" data-music-soundtrack-id="paradise-cracked" aria-describedby="portal-music-order-help" aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight" aria-pressed="true"><strong data-music-soundtrack-title="">Paradise Cracked</strong></button><button type="button" data-music-soundtrack="1" data-music-soundtrack-id="the-power-of-law" aria-describedby="portal-music-order-help" aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight" aria-pressed="false"><strong data-music-soundtrack-title="">The Power of Law</strong></button></div><span class="sr-only" id="portal-music-order-help" data-music-order-help=""></span><span class="sr-only" aria-live="polite" aria-atomic="true" data-music-order-status=""></span></div></header><div class="portal-music__controls" data-music-controls=""><button type="button" aria-label="Previous track" data-music-previous=""><i class="portal-music__nav-glyph" data-music-target="header.nav.player-glyphs" data-music-instance-phase="0.25" aria-hidden="true">←</i></button><button type="button" aria-expanded="false" aria-controls="portal-music-playlist" data-music-playlist-toggle=""><span class="portal-music__playlist-marker" data-music-target="header.nav.player-glyphs" data-music-instance-phase="0.75" aria-hidden="true">▾</span><span class="sr-only" data-music-playlist-label="">Tracks</span><strong data-music-title="">Title 01</strong><span data-music-playlist-counter="">1 / 22</span></button><button type="button" aria-label="Next track" data-music-next=""><i class="portal-music__nav-glyph" data-music-target="header.nav.player-glyphs" data-music-instance-phase="0.5" aria-hidden="true">→</i></button></div><div id="portal-music-playlist" hidden="" data-music-playlist=""><ol class="portal-music__playlist" data-music-soundtrack-playlist="0" data-music-soundtrack-id="paradise-cracked" aria-label="Tracks from “Paradise Cracked”"><li><button type="button" data-music-track="0" data-music-track-soundtrack="0" aria-pressed="true"><span>01</span><strong>Title 01</strong><time>04:48</time></button></li><li><button type="button" data-music-track="1" data-music-track-soundtrack="0" aria-pressed="false"><span>02</span><strong>Title 02</strong><time>03:26</time></button></li><li><button type="button" data-music-track="2" data-music-track-soundtrack="0" aria-pressed="false"><span>03</span><strong>Title 03</strong><time>05:36</time></button></li><li><button type="button" data-music-track="3" data-music-track-soundtrack="0" aria-pressed="false"><span>04</span><strong>High Town 01</strong><time>05:04</time></button></li><li><button type="button" data-music-track="4" data-music-track-soundtrack="0" aria-pressed="false"><span>05</span><strong>High Town 02</strong><time>03:29</time></button></li><li><button type="button" data-music-track="5" data-music-track-soundtrack="0" aria-pressed="false"><span>06</span><strong>High Town 03</strong><time>03:59</time></button></li><li><button type="button" data-music-track="6" data-music-track-soundtrack="0" aria-pressed="false"><span>07</span><strong>High Town 04</strong><time>03:12</time></button></li><li><button type="button" data-music-track="7" data-music-track-soundtrack="0" aria-pressed="false"><span>08</span><strong>Night City</strong><time>03:29</time></button></li><li><button type="button" data-music-track="8" data-music-track-soundtrack="0" aria-pressed="false"><span>09</span><strong>Orbital Station 01</strong><time>03:12</time></button></li><li><button type="button" data-music-track="9" data-music-track-soundtrack="0" aria-pressed="false"><span>10</span><strong>Orbital Station 02</strong><time>03:43</time></button></li><li><button type="button" data-music-track="10" data-music-track-soundtrack="0" aria-pressed="false"><span>11</span><strong>Orbital Station 04</strong><time>03:12</time></button></li><li><button type="button" data-music-track="11" data-music-track-soundtrack="0" aria-pressed="false"><span>12</span><strong>Punk Zone 01</strong><time>05:07</time></button></li><li><button type="button" data-music-track="12" data-music-track-soundtrack="0" aria-pressed="false"><span>13</span><strong>Punk Zone 01a</strong><time>03:24</time></button></li><li><button type="button" data-music-track="13" data-music-track-soundtrack="0" aria-pressed="false"><span>14</span><strong>Punk Zone 02</strong><time>03:21</time></button></li><li><button type="button" data-music-track="14" data-music-track-soundtrack="0" aria-pressed="false"><span>15</span><strong>Punk Zone 05</strong><time>02:56</time></button></li><li><button type="button" data-music-track="15" data-music-track-soundtrack="0" aria-pressed="false"><span>16</span><strong>Sky Town 01</strong><time>02:54</time></button></li><li><button type="button" data-music-track="16" data-music-track-soundtrack="0" aria-pressed="false"><span>17</span><strong>Sky Town 01a</strong><time>04:48</time></button></li><li><button type="button" data-music-track="17" data-music-track-soundtrack="0" aria-pressed="false"><span>18</span><strong>Sky Town 02</strong><time>03:12</time></button></li><li><button type="button" data-music-track="18" data-music-track-soundtrack="0" aria-pressed="false"><span>19</span><strong>Sky Town 03</strong><time>04:14</time></button></li><li><button type="button" data-music-track="19" data-music-track-soundtrack="0" aria-pressed="false"><span>20</span><strong>Sky Town 04</strong><time>03:29</time></button></li><li><button type="button" data-music-track="20" data-music-track-soundtrack="0" aria-pressed="false"><span>21</span><strong>Sky Town 05</strong><time>03:58</time></button></li><li><button type="button" data-music-track="21" data-music-track-soundtrack="0" aria-pressed="false"><span>22</span><strong>Final</strong><time>03:56</time></button></li></ol><ol class="portal-music__playlist" hidden="" data-music-soundtrack-playlist="1" data-music-soundtrack-id="the-power-of-law" aria-label="Tracks from “The Power of Law”"><li><button type="button" data-music-track="0" data-music-track-soundtrack="1" aria-pressed="false"><span>01</span><strong>PoL 01</strong><time>03:04</time></button></li><li><button type="button" data-music-track="1" data-music-track-soundtrack="1" aria-pressed="false"><span>02</span><strong>PoL 01a</strong><time>03:31</time></button></li><li><button type="button" data-music-track="2" data-music-track-soundtrack="1" aria-pressed="false"><span>03</span><strong>PoL 02</strong><time>04:02</time></button></li><li><button type="button" data-music-track="3" data-music-track-soundtrack="1" aria-pressed="false"><span>04</span><strong>PoL 03</strong><time>03:49</time></button></li><li><button type="button" data-music-track="4" data-music-track-soundtrack="1" aria-pressed="false"><span>05</span><strong>PoL 04</strong><time>04:20</time></button></li><li><button type="button" data-music-track="5" data-music-track-soundtrack="1" aria-pressed="false"><span>06</span><strong>PoL 05</strong><time>04:07</time></button></li><li><button type="button" data-music-track="6" data-music-track-soundtrack="1" aria-pressed="false"><span>07</span><strong>PoL 06</strong><time>03:02</time></button></li><li><button type="button" data-music-track="7" data-music-track-soundtrack="1" aria-pressed="false"><span>08</span><strong>PoL 07</strong><time>02:46</time></button></li><li><button type="button" data-music-track="8" data-music-track-soundtrack="1" aria-pressed="false"><span>09</span><strong>PoL 08</strong><time>03:01</time></button></li><li><button type="button" data-music-track="9" data-music-track-soundtrack="1" aria-pressed="false"><span>10</span><strong>PoL 09</strong><time>02:54</time></button></li><li><button type="button" data-music-track="10" data-music-track-soundtrack="1" aria-pressed="false"><span>11</span><strong>PoL 10</strong><time>03:12</time></button></li><li><button type="button" data-music-track="11" data-music-track-soundtrack="1" aria-pressed="false"><span>12</span><strong>PoL 11</strong><time>02:58</time></button></li><li><button type="button" data-music-track="12" data-music-track-soundtrack="1" aria-pressed="false"><span>13</span><strong>PoL 12</strong><time>03:29</time></button></li><li><button type="button" data-music-track="13" data-music-track-soundtrack="1" aria-pressed="false"><span>14</span><strong>PoL Pub 1</strong><time>04:24</time></button></li><li><button type="button" data-music-track="14" data-music-track-soundtrack="1" aria-pressed="false"><span>15</span><strong>PoL Pub 2</strong><time>04:31</time></button></li><li><button type="button" data-music-track="15" data-music-track-soundtrack="1" aria-pressed="false"><span>16</span><strong>PoL Addon A</strong><time>04:38</time></button></li><li><button type="button" data-music-track="16" data-music-track-soundtrack="1" aria-pressed="false"><span>17</span><strong>PoL Addon B</strong><time>04:02</time></button></li><li><button type="button" data-music-track="17" data-music-track-soundtrack="1" aria-pressed="false"><span>18</span><strong>PoL Addon C</strong><time>03:13</time></button></li></ol><span class="portal-music__playlist-scrollbar" data-music-playlist-scrollbar="" aria-hidden="true" hidden=""><i data-music-playlist-scrollbar-thumb=""></i></span></div></div></aside><script>(function(){const soundtracks = [{"id":"paradise-cracked","title":"Код доступа: РАЙ","tracks":[{"file":"title01.ogg","title":"Title 01","duration":"04:48","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/title01.ogg","behavior":{"schema":1,"source":{"sha256":"c7ba1dc84d8afd82db2122dd36c31bae18fa8f50bea58bcfa2097f1b4c975ed6","durationSec":288.107},"mastering":{"absolutePower":0.6839,"integratedLufs":-12.1,"loudnessRangeLu":12.3,"truePeakDbfs":1,"ceilingPressure":0.7273},"dynamics":{"floor":0.0947,"median":0.3407,"peak":1,"contrast":0.804},"character":{"density":0.6288,"brightness":0.8253,"noisiness":0.782,"low":0.2286,"mid":0.4629,"high":0.1618,"tags":["bright-impact","wide-dynamics"]},"motion":{"drift":0.4924,"impulse":0.6486,"shimmer":0.8131,"contrast":0.804},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"title02.ogg","title":"Title 02","duration":"03:26","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/title02.ogg","behavior":{"schema":1,"source":{"sha256":"d99a3080e204688fd95526f0f94c4fee8ee17e376f30ea25e407702132ca0d69","durationSec":205.926},"mastering":{"absolutePower":0.4121,"integratedLufs":-16.5,"loudnessRangeLu":6.5,"truePeakDbfs":-0.1,"ceilingPressure":0.5273},"dynamics":{"floor":0.3639,"median":0.6357,"peak":1,"contrast":0.1545},"character":{"density":0.2914,"brightness":0.2068,"noisiness":0.4963,"low":0.1621,"mid":0.4258,"high":0.0815,"tags":["sparse-ambient"]},"motion":{"drift":0.5534,"impulse":0.3349,"shimmer":0.2879,"contrast":0.1545},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"title03.ogg","title":"Title 03","duration":"05:36","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/title03.ogg","behavior":{"schema":1,"source":{"sha256":"e91ea2c10a050b199b3058d1b0901ce073f56daa45380487751ba1d0d1e480fc","durationSec":335.52},"mastering":{"absolutePower":0.6531,"integratedLufs":-12.5,"loudnessRangeLu":10.9,"truePeakDbfs":0.7,"ceilingPressure":0.6727},"dynamics":{"floor":0.2243,"median":0.5238,"peak":1,"contrast":0.388},"character":{"density":0.8641,"brightness":0.6278,"noisiness":0.7906,"low":0.0795,"mid":0.5734,"high":0.3047,"tags":["dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.2065,"impulse":0.7881,"shimmer":0.6734,"contrast":0.388},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"HighTown01.ogg","title":"High Town 01","duration":"05:04","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/HighTown01.ogg","behavior":{"schema":1,"source":{"sha256":"5e74d0cfc34d0f3f43bd2cb5fc662efb33edf0983e6b75b48e15a208c5e4834f","durationSec":304.003},"mastering":{"absolutePower":0.4732,"integratedLufs":-15.3,"loudnessRangeLu":7.3,"truePeakDbfs":0.7,"ceilingPressure":0.6727},"dynamics":{"floor":0.2669,"median":0.666,"peak":1,"contrast":0.3041},"character":{"density":0.8032,"brightness":0.2765,"noisiness":0.5447,"low":0.2494,"mid":0.5056,"high":0.1,"tags":["dense-rhythmic"]},"motion":{"drift":0.2269,"impulse":0.6844,"shimmer":0.3516,"contrast":0.3041},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"HighTown02.ogg","title":"High Town 02","duration":"03:29","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/HighTown02.ogg","behavior":{"schema":1,"source":{"sha256":"3e4b580f44c310b57e28e022511531828b01ef8f4746d3aaa36cdf118ee14f4f","durationSec":209.458},"mastering":{"absolutePower":0.3631,"integratedLufs":-17.6,"loudnessRangeLu":16.1,"truePeakDbfs":0,"ceilingPressure":0.5455},"dynamics":{"floor":0.0272,"median":0.3095,"peak":1,"contrast":1},"character":{"density":0.4198,"brightness":0.2347,"noisiness":0.4261,"low":0.0418,"mid":0.0352,"high":0,"tags":["wide-dynamics"]},"motion":{"drift":0.6978,"impulse":0.3994,"shimmer":0.2883,"contrast":1},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"HighTown03.ogg","title":"High Town 03","duration":"03:59","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/HighTown03.ogg","behavior":{"schema":1,"source":{"sha256":"f9697646758f3f23c38e4e3b1de0010b387de396d187d11051edccf16edc96d8","durationSec":239.215},"mastering":{"absolutePower":0.507,"integratedLufs":-14.7,"loudnessRangeLu":11.2,"truePeakDbfs":-1.2,"ceilingPressure":0.3273},"dynamics":{"floor":0.1225,"median":0.5192,"peak":1,"contrast":0.68},"character":{"density":0.7962,"brightness":0.4817,"noisiness":0.6569,"low":0.5981,"mid":0.3464,"high":0.1379,"tags":["dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.3371,"impulse":0.6921,"shimmer":0.5307,"contrast":0.68},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"HighTown04.ogg","title":"High Town 04","duration":"03:12","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/HighTown04.ogg","behavior":{"schema":1,"source":{"sha256":"39f1522025b22de2445d3199f28d97073346a41aec02486951ea5a70c495b719","durationSec":192.003},"mastering":{"absolutePower":0.3428,"integratedLufs":-18.1,"loudnessRangeLu":11.6,"truePeakDbfs":0,"ceilingPressure":0.5455},"dynamics":{"floor":0.1142,"median":0.4402,"peak":1,"contrast":0.7136},"character":{"density":0.4401,"brightness":0.0731,"noisiness":0.1891,"low":0.3857,"mid":0.1023,"high":0.0123,"tags":["dark-low","wide-dynamics"]},"motion":{"drift":0.6029,"impulse":0.4051,"shimmer":0.1056,"contrast":0.7136},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"NightCity.ogg","title":"Night City","duration":"03:29","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/NightCity.ogg","behavior":{"schema":1,"source":{"sha256":"ebbb436fe9db1f06cbaecefd836c0ace3b33c22baeb88ce919fae4ff6922c157","durationSec":209.009},"mastering":{"absolutePower":0.4217,"integratedLufs":-16.3,"loudnessRangeLu":9.9,"truePeakDbfs":-0.2,"ceilingPressure":0.5091},"dynamics":{"floor":0.157,"median":0.4398,"peak":1,"contrast":0.5601},"character":{"density":0.2879,"brightness":0.3555,"noisiness":0.4954,"low":0.0391,"mid":0.3386,"high":0.1394,"tags":["sparse-ambient"]},"motion":{"drift":0.6696,"impulse":0.336,"shimmer":0.3946,"contrast":0.5601},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"OrbitalStation01.ogg","title":"Orbital Station 01","duration":"03:12","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/OrbitalStation01.ogg","behavior":{"schema":1,"source":{"sha256":"a7f7a2801db0e958a6cc15728064243bd943f628232381df91f3c3a64f01c282","durationSec":192.003},"mastering":{"absolutePower":0.5129,"integratedLufs":-14.6,"loudnessRangeLu":5.4,"truePeakDbfs":0.2,"ceilingPressure":0.5818},"dynamics":{"floor":0.3433,"median":0.6658,"peak":1,"contrast":0.1826},"character":{"density":0.7639,"brightness":0.2344,"noisiness":0.4678,"low":0.6196,"mid":0.5993,"high":0.1343,"tags":["dense-rhythmic"]},"motion":{"drift":0.2211,"impulse":0.6735,"shimmer":0.2998,"contrast":0.1826},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"OrbitalStation02.ogg","title":"Orbital Station 02","duration":"03:43","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/OrbitalStation02.ogg","behavior":{"schema":1,"source":{"sha256":"d5ae321e026a552497ab83d978c5b1db4bddc9781e6669b5283fd62b727dca64","durationSec":222.723},"mastering":{"absolutePower":0.6683,"integratedLufs":-12.3,"loudnessRangeLu":8.8,"truePeakDbfs":0.5,"ceilingPressure":0.6364},"dynamics":{"floor":0.0859,"median":0.5871,"peak":1,"contrast":0.851},"character":{"density":0.9356,"brightness":0.4013,"noisiness":0.5781,"low":0.8739,"mid":0.3902,"high":0.151,"tags":["dense-rhythmic"]},"motion":{"drift":0.2846,"impulse":0.8394,"shimmer":0.4508,"contrast":0.851},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"OrbitalStation04.ogg","title":"Orbital Station 04","duration":"03:12","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/OrbitalStation04.ogg","behavior":{"schema":1,"source":{"sha256":"f84a5a825f44a61ce394deb4ea72966fef66eaa5b5ea16c9b7328636d8686854","durationSec":192.003},"mastering":{"absolutePower":0.6383,"integratedLufs":-12.7,"loudnessRangeLu":6.2,"truePeakDbfs":0.2,"ceilingPressure":0.5818},"dynamics":{"floor":0.1533,"median":0.5356,"peak":1,"contrast":0.5716},"character":{"density":0.6962,"brightness":0.2903,"noisiness":0.4506,"low":0.3846,"mid":0.3971,"high":0.0965,"tags":["balanced-flow"]},"motion":{"drift":0.3788,"impulse":0.6753,"shimmer":0.3352,"contrast":0.5716},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PunkZone01.ogg","title":"Punk Zone 01","duration":"05:07","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/PunkZone01.ogg","behavior":{"schema":1,"source":{"sha256":"c15ff25be779d549def305d263bf1a9f4f76ed4395872a4496fa2da527845b1d","durationSec":307.203},"mastering":{"absolutePower":0.3126,"integratedLufs":-18.9,"loudnessRangeLu":11.3,"truePeakDbfs":-0.3,"ceilingPressure":0.4909},"dynamics":{"floor":0.2139,"median":0.4667,"peak":1,"contrast":0.4108},"character":{"density":0.3129,"brightness":0.0576,"noisiness":0.2724,"low":0.0579,"mid":0.2324,"high":0.0038,"tags":["dark-low","sparse-ambient","wide-dynamics"]},"motion":{"drift":0.6097,"impulse":0.3128,"shimmer":0.1177,"contrast":0.4108},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PunkZone01a.ogg","title":"Punk Zone 01a","duration":"03:24","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/PunkZone01a.ogg","behavior":{"schema":1,"source":{"sha256":"27a5a25d4021cfe59b60a6f6efa0d8a3652aee826b44bdfaeda390ac987b6474","durationSec":204.019},"mastering":{"absolutePower":0.2754,"integratedLufs":-20,"loudnessRangeLu":5.3,"truePeakDbfs":0.3,"ceilingPressure":0.6},"dynamics":{"floor":0.08,"median":0.4358,"peak":1,"contrast":0.8852},"character":{"density":0.3897,"brightness":0.4324,"noisiness":0.6149,"low":0.1436,"mid":0.0287,"high":0,"tags":["balanced-flow"]},"motion":{"drift":0.6873,"impulse":0.3485,"shimmer":0.4835,"contrast":0.8852},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PunkZone02.ogg","title":"Punk Zone 02","duration":"03:21","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/PunkZone02.ogg","behavior":{"schema":1,"source":{"sha256":"ec45c159b258ace056d318451cda32044fad5865d5292aab437c800117260a39","durationSec":200.731},"mastering":{"absolutePower":0.5559,"integratedLufs":-13.9,"loudnessRangeLu":6.6,"truePeakDbfs":1.1,"ceilingPressure":0.7455},"dynamics":{"floor":0.1732,"median":0.5317,"peak":1,"contrast":0.5128},"character":{"density":0.9177,"brightness":0.8672,"noisiness":0.7746,"low":0.4844,"mid":0.4182,"high":0.0934,"tags":["bright-impact","dense-rhythmic"]},"motion":{"drift":0.2028,"impulse":0.7875,"shimmer":0.8413,"contrast":0.5128},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PunkZone05.ogg","title":"Punk Zone 05","duration":"02:56","theme":"punk-zone-05","danceProfile":"punk-zone-05","visualization":{"bpm":120.19,"crashes":[5.492,7.117,9.242,13.491,15.116,16.869,57.243,59.24,65.242,67.239,105.744,107.241,109.743,111.241,113.743,115.241,117.743,154.477,175.2],"sections":[{"start":16.85,"end":33.7,"level":1},{"start":37.95,"end":70.05,"level":0.92},{"start":73.8,"end":78.1,"level":0.72},{"start":81.1,"end":102.3,"level":1},{"start":104,"end":136.1,"level":0.9},{"start":140,"end":153.2,"level":1},{"start":156.3,"end":172.4,"level":1}]},"src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/PunkZone05.ogg","behavior":{"schema":1,"source":{"sha256":"9902ab30a49ec16e0495b0322587c7da53167f55a7138bfa78d0cbdbd5010868","durationSec":175.971},"mastering":{"absolutePower":1,"integratedLufs":-8.8,"loudnessRangeLu":4.8,"truePeakDbfs":0.9,"ceilingPressure":0.7091},"dynamics":{"floor":0.3621,"median":0.6912,"peak":1,"contrast":0.1568},"character":{"density":0.7426,"brightness":0.9678,"noisiness":0.9874,"low":0.8548,"mid":0.906,"high":0.6304,"tags":["bright-impact"]},"motion":{"drift":0.2293,"impulse":0.8353,"shimmer":0.9733,"contrast":0.1568},"timing":{"beat":{"approved":true,"bpm":120.19},"downbeat":{"approved":false},"sections":{"approved":true,"items":[{"start":16.85,"end":33.7,"level":1},{"start":37.95,"end":70.05,"level":0.92},{"start":73.8,"end":78.1,"level":0.72},{"start":81.1,"end":102.3,"level":1},{"start":104,"end":136.1,"level":0.9},{"start":140,"end":153.2,"level":1},{"start":156.3,"end":172.4,"level":1}]},"crashes":{"approved":true,"times":[5.492,7.117,9.242,13.491,15.116,16.869,57.243,59.24,65.242,67.239,105.744,107.241,109.743,111.241,113.743,115.241,117.743,154.477,175.2]}}}},{"file":"SkyTown01.ogg","title":"Sky Town 01","duration":"02:54","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/SkyTown01.ogg","behavior":{"schema":1,"source":{"sha256":"6253ba78efb96dd22c257ad1b6e22cfcfc7d1759a0de130d8726ac34ea0b573e","durationSec":174.003},"mastering":{"absolutePower":0.3428,"integratedLufs":-18.1,"loudnessRangeLu":10.4,"truePeakDbfs":-3.2,"ceilingPressure":0},"dynamics":{"floor":0.2754,"median":0.6313,"peak":1,"contrast":0.289},"character":{"density":0.4866,"brightness":0.0318,"noisiness":0.0261,"low":0.0958,"mid":0.3501,"high":0.0535,"tags":["dark-low","wide-dynamics"]},"motion":{"drift":0.4506,"impulse":0.4348,"shimmer":0.0302,"contrast":0.289},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"SkyTown01a.ogg","title":"Sky Town 01a","duration":"04:48","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/SkyTown01a.ogg","behavior":{"schema":1,"source":{"sha256":"852d11b0779220eae01a9e4d2982e2ab4bb533ea202c20c14580b2d35ec98bf2","durationSec":288.003},"mastering":{"absolutePower":0.6095,"integratedLufs":-13.1,"loudnessRangeLu":6.9,"truePeakDbfs":0.2,"ceilingPressure":0.5818},"dynamics":{"floor":0.2342,"median":0.5292,"peak":1,"contrast":0.3671},"character":{"density":0.7326,"brightness":0.5081,"noisiness":0.685,"low":0.4219,"mid":0.5701,"high":0.1486,"tags":["balanced-flow"]},"motion":{"drift":0.2953,"impulse":0.6883,"shimmer":0.5576,"contrast":0.3671},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"SkyTown02.ogg","title":"Sky Town 02","duration":"03:12","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/SkyTown02.ogg","behavior":{"schema":1,"source":{"sha256":"fd162542eb54bd9fd042fe853435aedf8d8c11a29d0a9fbc5aee1a6051402bcd","durationSec":192.003},"mastering":{"absolutePower":0.335,"integratedLufs":-18.3,"loudnessRangeLu":12.2,"truePeakDbfs":0,"ceilingPressure":0.5455},"dynamics":{"floor":0.1432,"median":0.4438,"peak":1,"contrast":0.6045},"character":{"density":0.0095,"brightness":0.0652,"noisiness":0.1742,"low":0,"mid":0.2363,"high":0,"tags":["dark-low","sparse-ambient","wide-dynamics"]},"motion":{"drift":0.8824,"impulse":0.1267,"shimmer":0.0958,"contrast":0.6045},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"SkyTown03.ogg","title":"Sky Town 03","duration":"04:14","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/SkyTown03.ogg","behavior":{"schema":1,"source":{"sha256":"a8e2d9d03f0d9c2c157041c68380dfe8374569024a055bbb53ddd4a0cb714b70","durationSec":253.717},"mastering":{"absolutePower":0.6237,"integratedLufs":-12.9,"loudnessRangeLu":8.1,"truePeakDbfs":0.4,"ceilingPressure":0.6182},"dynamics":{"floor":0.1519,"median":0.5134,"peak":1,"contrast":0.576},"character":{"density":0.822,"brightness":0.74,"noisiness":0.8224,"low":0.5473,"mid":0.3496,"high":0.2321,"tags":["bright-impact","dense-rhythmic"]},"motion":{"drift":0.2895,"impulse":0.7506,"shimmer":0.7631,"contrast":0.576},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"SkyTown04.ogg","title":"Sky Town 04","duration":"03:29","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/SkyTown04.ogg","behavior":{"schema":1,"source":{"sha256":"25e21bf78b0a8f9f7649dee014ede6a16fc5bae5783fd346d48d3657eb60f4ba","durationSec":209.457},"mastering":{"absolutePower":0.507,"integratedLufs":-14.7,"loudnessRangeLu":4.9,"truePeakDbfs":0.9,"ceilingPressure":0.7091},"dynamics":{"floor":0.3247,"median":0.5672,"peak":1,"contrast":0.2095},"character":{"density":0.7596,"brightness":0.7678,"noisiness":0.7415,"low":0.2427,"mid":0.4865,"high":0.096,"tags":["bright-impact","dense-rhythmic"]},"motion":{"drift":0.2318,"impulse":0.6686,"shimmer":0.7604,"contrast":0.2095},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"SkyTown05.ogg","title":"Sky Town 05","duration":"03:58","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/SkyTown05.ogg","behavior":{"schema":1,"source":{"sha256":"d4bc36dab8b521eb090653e6b00615398309b9c32c3e64de24263c226c705b4e","durationSec":237.729},"mastering":{"absolutePower":0.4898,"integratedLufs":-15,"loudnessRangeLu":10.2,"truePeakDbfs":0.1,"ceilingPressure":0.5636},"dynamics":{"floor":0.1328,"median":0.4217,"peak":1,"contrast":0.6407},"character":{"density":0.8695,"brightness":0.7561,"noisiness":0.812,"low":0.2233,"mid":0.4131,"high":0.1633,"tags":["bright-impact","dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.2733,"impulse":0.7328,"shimmer":0.7717,"contrast":0.6407},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"final.ogg","title":"Final","duration":"03:56","src":"/reality413universe-pages/media/gallery/paradise-cracked-ost/final.ogg","behavior":{"schema":1,"source":{"sha256":"7db7469f2a5bf6b4a31109c55ca93d625209bdc407d31682ab24d948d4aa31cd","durationSec":236.31},"mastering":{"absolutePower":0.5248,"integratedLufs":-14.4,"loudnessRangeLu":4.5,"truePeakDbfs":0.3,"ceilingPressure":0.6},"dynamics":{"floor":0.3108,"median":0.5564,"peak":1,"contrast":0.2306},"character":{"density":0.8666,"brightness":0.8745,"noisiness":0.9587,"low":0.3018,"mid":0.3404,"high":0.3047,"tags":["bright-impact","dense-rhythmic"]},"motion":{"drift":0.1606,"impulse":0.7436,"shimmer":0.898,"contrast":0.2306},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}}]},{"id":"the-power-of-law","title":"Власть Закона","tracks":[{"file":"PoL_01.ogg","title":"PoL 01","duration":"03:04","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_01.ogg","behavior":{"schema":1,"source":{"sha256":"01b248621c6699dd49f99c48b7378741202b8de5526af578a4e4ca2359445a84","durationSec":184.293},"mastering":{"absolutePower":0.6531,"integratedLufs":-12.5,"loudnessRangeLu":5.8,"truePeakDbfs":1,"ceilingPressure":0.7273},"dynamics":{"floor":0.2274,"median":0.6208,"peak":1,"contrast":0.3813},"character":{"density":0.7956,"brightness":0.286,"noisiness":0.471,"low":0.7774,"mid":0.3567,"high":0.1945,"tags":["dense-rhythmic"]},"motion":{"drift":0.2539,"impulse":0.7443,"shimmer":0.3378,"contrast":0.3813},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_01a.ogg","title":"PoL 01a","duration":"03:31","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_01a.ogg","behavior":{"schema":1,"source":{"sha256":"3400cf1166336db31f5aaad71b70936e183766361d929c8def32bdca2446e3f0","durationSec":211.176},"mastering":{"absolutePower":0.6607,"integratedLufs":-12.4,"loudnessRangeLu":12.2,"truePeakDbfs":0.8,"ceilingPressure":0.6909},"dynamics":{"floor":0.1051,"median":0.6677,"peak":1,"contrast":0.7537},"character":{"density":0.6731,"brightness":0.4092,"noisiness":0.5872,"low":0.7994,"mid":0.3961,"high":0.1845,"tags":["wide-dynamics"]},"motion":{"drift":0.4464,"impulse":0.6686,"shimmer":0.459,"contrast":0.7537},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_02.ogg","title":"PoL 02","duration":"04:02","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_02.ogg","behavior":{"schema":1,"source":{"sha256":"39ba2affc9ee5b6bca147f398fb8696b4c2e61c588ba5b0f6911b6e4b5bad419","durationSec":241.721},"mastering":{"absolutePower":0.5754,"integratedLufs":-13.6,"loudnessRangeLu":4.8,"truePeakDbfs":-0.5,"ceilingPressure":0.4545},"dynamics":{"floor":0.2563,"median":0.6167,"peak":1,"contrast":0.3236},"character":{"density":0.7683,"brightness":0.4919,"noisiness":0.7569,"low":0.6247,"mid":0.4669,"high":0.2597,"tags":["dense-rhythmic"]},"motion":{"drift":0.2574,"impulse":0.6989,"shimmer":0.5661,"contrast":0.3236},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_03.ogg","title":"PoL 03","duration":"03:49","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_03.ogg","behavior":{"schema":1,"source":{"sha256":"422ad721158eefb9b0ae69d2ab1d600872cf26e4dcbeea42d9c8716c45a4657b","durationSec":228.832},"mastering":{"absolutePower":0.5012,"integratedLufs":-14.8,"loudnessRangeLu":4.3,"truePeakDbfs":0.2,"ceilingPressure":0.5818},"dynamics":{"floor":0.3792,"median":0.556,"peak":1,"contrast":0.1346},"character":{"density":0.9033,"brightness":0.8389,"noisiness":0.9467,"low":0.4162,"mid":0.3961,"high":0.3268,"tags":["bright-impact","dense-rhythmic"]},"motion":{"drift":0.1073,"impulse":0.7585,"shimmer":0.8691,"contrast":0.1346},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_04.ogg","title":"PoL 04","duration":"04:20","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_04.ogg","behavior":{"schema":1,"source":{"sha256":"f8261fa90ef155bb0927067e994dbfa52a0c3f0ee0cbf41bd1a0a8c7bef19bf6","durationSec":260.484},"mastering":{"absolutePower":0.4027,"integratedLufs":-16.7,"loudnessRangeLu":7,"truePeakDbfs":-0.5,"ceilingPressure":0.4545},"dynamics":{"floor":0.2571,"median":0.4501,"peak":1,"contrast":0.3222},"character":{"density":0.7163,"brightness":0.2261,"noisiness":0.4969,"low":0.1501,"mid":0.3671,"high":0.1442,"tags":["balanced-flow"]},"motion":{"drift":0.2945,"impulse":0.6034,"shimmer":0.3019,"contrast":0.3222},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_05.ogg","title":"PoL 05","duration":"04:07","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_05.ogg","behavior":{"schema":1,"source":{"sha256":"27613c84889b73eaf74fe61d78170eef97f56f90910736adfc070332a77db06f","durationSec":247.108},"mastering":{"absolutePower":0.537,"integratedLufs":-14.2,"loudnessRangeLu":5.6,"truePeakDbfs":0.1,"ceilingPressure":0.5636},"dynamics":{"floor":0.219,"median":0.4775,"peak":1,"contrast":0.3994},"character":{"density":0.7769,"brightness":0.5532,"noisiness":0.7354,"low":0.491,"mid":0.4073,"high":0.1828,"tags":["dense-rhythmic"]},"motion":{"drift":0.2724,"impulse":0.6906,"shimmer":0.6042,"contrast":0.3994},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_06.ogg","title":"PoL 06","duration":"03:02","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_06.ogg","behavior":{"schema":1,"source":{"sha256":"d51428ad7ac754ab5cc2bf3d06fc6d5f57e6a1ae730dde2f3a17399cf061c29a","durationSec":182.405},"mastering":{"absolutePower":0.537,"integratedLufs":-14.2,"loudnessRangeLu":11.2,"truePeakDbfs":0.9,"ceilingPressure":0.7091},"dynamics":{"floor":0.1096,"median":0.3898,"peak":1,"contrast":0.7336},"character":{"density":0.8311,"brightness":0.4345,"noisiness":0.7105,"low":0.2562,"mid":0.3671,"high":0.1831,"tags":["dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.327,"impulse":0.7253,"shimmer":0.5118,"contrast":0.7336},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_07.ogg","title":"PoL 07","duration":"02:46","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_07.ogg","behavior":{"schema":1,"source":{"sha256":"0239384ed64baecdbc9eebb1d8181b235377593672efed8b65bcf506ac244d12","durationSec":166.258},"mastering":{"absolutePower":0.3715,"integratedLufs":-17.4,"loudnessRangeLu":6.1,"truePeakDbfs":0,"ceilingPressure":0.5455},"dynamics":{"floor":0.1749,"median":0.4284,"peak":1,"contrast":0.5079},"character":{"density":0.6985,"brightness":0.274,"noisiness":0.4393,"low":0.0229,"mid":0.1985,"high":0.1889,"tags":["balanced-flow"]},"motion":{"drift":0.3593,"impulse":0.5808,"shimmer":0.3203,"contrast":0.5079},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_08.ogg","title":"PoL 08","duration":"03:01","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_08.ogg","behavior":{"schema":1,"source":{"sha256":"7923d36256a30664b89951eeb42073315ef5543afe6a94aa09ffc4df45294f6e","durationSec":180.538},"mastering":{"absolutePower":0.4842,"integratedLufs":-15.1,"loudnessRangeLu":12.5,"truePeakDbfs":2.4,"ceilingPressure":0.9818},"dynamics":{"floor":0.0961,"median":0.3558,"peak":1,"contrast":0.797},"character":{"density":0.9652,"brightness":0.3609,"noisiness":0.6242,"low":0.2989,"mid":0.3632,"high":0.0741,"tags":["dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.2482,"impulse":0.792,"shimmer":0.4346,"contrast":0.797},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_09.ogg","title":"PoL 09","duration":"02:54","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_09.ogg","behavior":{"schema":1,"source":{"sha256":"7eb48313cda5a3c6089f8e518d18de27f844d27be81d0700ba06f489cb20c207","durationSec":174.35},"mastering":{"absolutePower":0.4467,"integratedLufs":-15.8,"loudnessRangeLu":11.1,"truePeakDbfs":0,"ceilingPressure":0.5455},"dynamics":{"floor":0.1695,"median":0.4018,"peak":1,"contrast":0.5232},"character":{"density":0.8973,"brightness":0.1805,"noisiness":0.4484,"low":0.1277,"mid":0.4508,"high":0.0698,"tags":["dark-low","dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.2204,"impulse":0.7351,"shimmer":0.2555,"contrast":0.5232},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_10.ogg","title":"PoL 10","duration":"03:12","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_10.ogg","behavior":{"schema":1,"source":{"sha256":"ba1a9c6daba62eff9b6ef9be27891dba0ea956a8e75365d7335f9bbcab1fc1b6","durationSec":191.991},"mastering":{"absolutePower":0.5129,"integratedLufs":-14.6,"loudnessRangeLu":6,"truePeakDbfs":0.2,"ceilingPressure":0.5818},"dynamics":{"floor":0.1209,"median":0.4987,"peak":1,"contrast":0.6862},"character":{"density":0.7275,"brightness":0.4928,"noisiness":0.62,"low":0.722,"mid":0.2438,"high":0.092,"tags":["balanced-flow"]},"motion":{"drift":0.3883,"impulse":0.6502,"shimmer":0.5284,"contrast":0.6862},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_11.ogg","title":"PoL 11","duration":"02:58","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_11.ogg","behavior":{"schema":1,"source":{"sha256":"678163d93bf4cc12c46de7ac125e2f96ffeadae626c638e393432a77041611ff","durationSec":177.758},"mastering":{"absolutePower":0.4027,"integratedLufs":-16.7,"loudnessRangeLu":9.2,"truePeakDbfs":0,"ceilingPressure":0.5455},"dynamics":{"floor":0.078,"median":0.296,"peak":1,"contrast":0.898},"character":{"density":0.6734,"brightness":0.0899,"noisiness":0.3018,"low":0.0525,"mid":0.3119,"high":0.0171,"tags":["dark-low"]},"motion":{"drift":0.4866,"impulse":0.576,"shimmer":0.1492,"contrast":0.898},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_12.ogg","title":"PoL 12","duration":"03:29","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_12.ogg","behavior":{"schema":1,"source":{"sha256":"e6cd1097bf9afd887e902b1c3e85961260483db1a6538a009647d33c146b831f","durationSec":209.458},"mastering":{"absolutePower":0.6839,"integratedLufs":-12.1,"loudnessRangeLu":9.3,"truePeakDbfs":-0.4,"ceilingPressure":0.4727},"dynamics":{"floor":0.1305,"median":0.4414,"peak":1,"contrast":0.6493},"character":{"density":0.9147,"brightness":0.3264,"noisiness":0.5361,"low":0.7394,"mid":0.3333,"high":0.1669,"tags":["dense-rhythmic"]},"motion":{"drift":0.2432,"impulse":0.8316,"shimmer":0.3851,"contrast":0.6493},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_pub1.ogg","title":"PoL Pub 1","duration":"04:24","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_pub1.ogg","behavior":{"schema":1,"source":{"sha256":"79bbd363b07628d9e71fb4490aa803347d68eb6836d11e8c2c76f539892abbce","durationSec":264.049},"mastering":{"absolutePower":0.5495,"integratedLufs":-14,"loudnessRangeLu":11.4,"truePeakDbfs":1.3,"ceilingPressure":0.7818},"dynamics":{"floor":0.1158,"median":0.5134,"peak":1,"contrast":0.7071},"character":{"density":0.9203,"brightness":0.55,"noisiness":0.7341,"low":0.5648,"mid":0.319,"high":0.1543,"tags":["dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.2554,"impulse":0.7868,"shimmer":0.6016,"contrast":0.7071},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_pub2.ogg","title":"PoL Pub 2","duration":"04:31","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_pub2.ogg","behavior":{"schema":1,"source":{"sha256":"cb3c10d7bb5a6e09f982501e50197a0ab9e79a74afc16b13a64de83b4afb29a4","durationSec":270.605},"mastering":{"absolutePower":0.8035,"integratedLufs":-10.7,"loudnessRangeLu":7.3,"truePeakDbfs":1,"ceilingPressure":0.7273},"dynamics":{"floor":0.1632,"median":0.521,"peak":1,"contrast":0.5414},"character":{"density":0.8114,"brightness":0.409,"noisiness":0.622,"low":1,"mid":0.6045,"high":0.1814,"tags":["dense-rhythmic"]},"motion":{"drift":0.2874,"impulse":0.8086,"shimmer":0.4687,"contrast":0.5414},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_addon_a.ogg","title":"PoL Addon A","duration":"04:38","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_addon_a.ogg","behavior":{"schema":1,"source":{"sha256":"62a58d93ffad1c7fecdf97cee1cd498baa48f1f24555026524b56fd51b62ea5f","durationSec":278.468},"mastering":{"absolutePower":0.6237,"integratedLufs":-12.9,"loudnessRangeLu":9.4,"truePeakDbfs":0.8,"ceilingPressure":0.6909},"dynamics":{"floor":0.203,"median":0.568,"peak":1,"contrast":0.4362},"character":{"density":0.6772,"brightness":0.2557,"noisiness":0.5496,"low":0.6362,"mid":0.4554,"high":0.1895,"tags":["balanced-flow"]},"motion":{"drift":0.3545,"impulse":0.658,"shimmer":0.338,"contrast":0.4362},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_addon_b.ogg","title":"PoL Addon B","duration":"04:02","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_addon_b.ogg","behavior":{"schema":1,"source":{"sha256":"b35c0f2f26efa490117ba8cc289756c870a60c653ec74807b1626f649153a7d7","durationSec":241.955},"mastering":{"absolutePower":0.631,"integratedLufs":-12.8,"loudnessRangeLu":10.8,"truePeakDbfs":0.4,"ceilingPressure":0.6182},"dynamics":{"floor":0.1039,"median":0.541,"peak":1,"contrast":0.7591},"character":{"density":0.9059,"brightness":0.5888,"noisiness":0.8157,"low":0.5616,"mid":0.5417,"high":0.2552,"tags":["dense-rhythmic","wide-dynamics"]},"motion":{"drift":0.2803,"impulse":0.8069,"shimmer":0.6524,"contrast":0.7591},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}},{"file":"PoL_addon_c.ogg","title":"PoL Addon C","duration":"03:13","src":"/reality413universe-pages/media/gallery/power-of-law-ost/PoL_addon_c.ogg","behavior":{"schema":1,"source":{"sha256":"c6e3ff7a9595f9b31bfdfcbd4be7d772d022c42d98432fa4a04a42a61ff2220f","durationSec":192.868},"mastering":{"absolutePower":0.5559,"integratedLufs":-13.9,"loudnessRangeLu":6.1,"truePeakDbfs":0.5,"ceilingPressure":0.6364},"dynamics":{"floor":0.322,"median":0.5229,"peak":1,"contrast":0.2135},"character":{"density":0.6007,"brightness":0.0591,"noisiness":0.306,"low":0.3326,"mid":0.481,"high":0.0741,"tags":["dark-low"]},"motion":{"drift":0.3473,"impulse":0.5846,"shimmer":0.1283,"contrast":0.2135},"timing":{"beat":{"approved":false},"downbeat":{"approved":false},"sections":{"approved":false},"crashes":{"approved":false}}}}]}];
+const musicLocales = {"ru":{"open":"Открыть музыкальный плеер","title":"Музыка","soundtrackChoice":"Выбор саундтрека","soundtrackOrderHint":"Перетащите название по горизонтали, чтобы изменить порядок. С клавиатуры: Alt+Стрелка влево или Alt+Стрелка вправо.","soundtrackOrderAction":"Перетащите, чтобы изменить порядок саундтреков","soundtrackOrderFirst":"Первый и активный саундтрек","close":"Свернуть проигрыватель","unsupported":"Ваш браузер не поддерживает воспроизведение OGG.","transport":"Управление воспроизведением","play":"Воспроизвести","pause":"Поставить на паузу","paused":"Пауза","muted":"Без звука","mute":"Заглушить звук","unmute":"Вернуть звук","seek":"Позиция композиции","volume":"Громкость","previous":"Предыдущая композиция","tracks":"Композиции","next":"Следующая композиция","playlist":"Композиции саундтрека «{title}»","soundtrackTitles":["Код доступа: РАЙ","Власть Закона"]},"en":{"open":"Open music player","title":"Music","soundtrackChoice":"Choose soundtrack","soundtrackOrderHint":"Drag the title horizontally to change the order. Keyboard: Alt+Left Arrow or Alt+Right Arrow.","soundtrackOrderAction":"Drag to change the soundtrack order","soundtrackOrderFirst":"First and active soundtrack","close":"Collapse player","unsupported":"Your browser does not support OGG playback.","transport":"Playback controls","play":"Play","pause":"Pause","paused":"Paused","muted":"Muted","mute":"Mute","unmute":"Unmute","seek":"Track position","volume":"Volume","previous":"Previous track","tracks":"Tracks","next":"Next track","playlist":"Tracks from “{title}”","soundtrackTitles":["Paradise Cracked","The Power of Law"]}};
+const defaultLocale = "en";
+const soundtrackOrderStorageKey = "reality413-music-soundtrack-order";
+const audioQualityRegistry = {"storageKey":"reality413-music-audio-quality","danceStorageKey":"reality413-music-dance-enabled","danceDefault":false,"default":"opus-128","options":[{"id":"opus-96","label":"Opus 96 кбит/с"},{"id":"opus-128","label":"Opus 128 кбит/с"},{"id":"opus-160","label":"Opus 160 кбит/с"},{"id":"original","label":"Оригинальный OGG"}],"previewTracks":["PunkZone01.ogg","PunkZone01a.ogg","PunkZone02.ogg","PunkZone05.ogg"]};
+
+  const storageKey = 'reality413-music-player';
+
+  function initPortalMusicPlayer() {
+    const player = document.querySelector('[data-portal-music]');
+    if (!(player instanceof HTMLElement)) return;
+
+    if (player.dataset.ready === 'true') {
+      player.dispatchEvent(new CustomEvent('portal:music-language'));
+      return;
+    }
+
+    const soundtrackButtons = [...player.querySelectorAll('[data-music-soundtrack]')];
+    const soundtrackPlaylists = [...player.querySelectorAll('[data-music-soundtrack-playlist]')];
+    const panel = player.querySelector('[data-music-panel]');
+    const audio = player.querySelector('[data-music-audio]');
+    const playToggle = player.querySelector('[data-music-play]');
+    const muteToggle = player.querySelector('[data-music-mute]');
+    const seek = player.querySelector('[data-music-seek]');
+    const currentTime = player.querySelector('[data-music-current]');
+    const duration = player.querySelector('[data-music-duration]');
+    const volume = player.querySelector('[data-music-volume]');
+    const title = player.querySelector('[data-music-title]');
+    const previous = player.querySelector('[data-music-previous]');
+    const next = player.querySelector('[data-music-next]');
+    const playlistToggle = player.querySelector('[data-music-playlist-toggle]');
+    const playlistCounter = playlistToggle?.querySelector('[data-music-playlist-counter]');
+    const playlist = player.querySelector('[data-music-playlist]');
+    const playlistScrollbar = player.querySelector('[data-music-playlist-scrollbar]');
+    const playlistScrollbarThumb = player.querySelector('[data-music-playlist-scrollbar-thumb]');
+    const trackButtons = [...player.querySelectorAll('[data-music-track]')];
+    if (!(panel instanceof HTMLElement)
+      || !(audio instanceof HTMLAudioElement)
+      || !(playToggle instanceof HTMLButtonElement)
+      || !(muteToggle instanceof HTMLButtonElement)
+      || !(seek instanceof HTMLInputElement)
+      || !(currentTime instanceof HTMLTimeElement)
+      || !(duration instanceof HTMLTimeElement)
+      || !(volume instanceof HTMLInputElement)
+      || !(title instanceof HTMLElement)
+      || !trackButtons.length) return;
+
+    player.dataset.ready = 'true';
+    let labels = musicLocales[defaultLocale];
+    const soundtrackIds = soundtracks.map((soundtrack) => soundtrack.id);
+    let storedSoundtrackOrder = [];
+    try {
+      const parsedOrder = JSON.parse(localStorage.getItem(soundtrackOrderStorageKey) || '[]');
+      if (Array.isArray(parsedOrder)) storedSoundtrackOrder = parsedOrder.filter((id) => soundtrackIds.includes(id));
+    } catch {}
+    const completeSoundtrackOrder = [...new Set([...storedSoundtrackOrder, ...soundtrackIds])];
+    const preferredSoundtrackIndex = Math.max(0, soundtracks.findIndex((soundtrack) => soundtrack.id === completeSoundtrackOrder[0]));
+    const qualityIds = audioQualityRegistry.options.map((option) => option.id);
+    let audioQuality = localStorage.getItem(audioQualityRegistry.storageKey) || audioQualityRegistry.default;
+    if (!qualityIds.includes(audioQuality)) audioQuality = audioQualityRegistry.default;
+    let danceEnabled = localStorage.getItem(audioQualityRegistry.danceStorageKey) === 'true';
+    let currentSoundtrackIndex = preferredSoundtrackIndex;
+    let currentIndex = 0;
+    const savedTrackIndexes = soundtracks.map(() => 0);
+    const savedSoundtrackResumes = Object.fromEntries(soundtracks.map((soundtrack) => [soundtrack.id, { track: 0, position: 0 }]));
+    let hasSelectedTrack = false;
+    let trackLoadToken = 0;
+    let pendingSeekTime = null;
+    let lastPositionPersistedAt = 0;
+    let audioContext;
+    let analyser;
+    let audioSource;
+    let frequencyData;
+    let visualizerFrame;
+    let lowBaseline = .08;
+    let beatLevel = 0;
+    let driveLevel = 0;
+    let beatDirection = 1;
+    let beatLatched = false;
+    let crashLevel = 0;
+    let previousVolume = .8;
+    let hasStarted = false;
+    let requestedTheme = '';
+    let themeIntroPending = true;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      if (Number.isInteger(saved.track) && saved.track >= 0 && saved.track < soundtracks[0].tracks.length) savedTrackIndexes[0] = saved.track;
+      if (Array.isArray(saved.soundtrackTracks)) {
+        saved.soundtrackTracks.forEach((trackIndex, soundtrackIndex) => {
+          const soundtrack = soundtracks[soundtrackIndex];
+          if (soundtrack && Number.isInteger(trackIndex) && trackIndex >= 0 && trackIndex < soundtrack.tracks.length) savedTrackIndexes[soundtrackIndex] = trackIndex;
+        });
+      }
+      soundtracks.forEach((soundtrack, soundtrackIndex) => {
+        const selectedTrack = savedTrackIndexes[soundtrackIndex];
+        const resume = saved.soundtrackResumes?.[soundtrack.id];
+        const legacyPosition = saved.soundtrackPositions?.[soundtrack.id]?.[selectedTrack];
+        const resumeTrack = Number(resume?.track);
+        const resumePosition = Number(resume?.position ?? legacyPosition);
+        const validTrack = Number.isInteger(resumeTrack)
+          && resumeTrack >= 0
+          && resumeTrack < soundtrack.tracks.length
+          ? resumeTrack
+          : selectedTrack;
+        if (validTrack === selectedTrack && Number.isFinite(resumePosition) && resumePosition >= 0) {
+          savedSoundtrackResumes[soundtrack.id] = { track: selectedTrack, position: resumePosition };
+        }
+      });
+      currentIndex = savedTrackIndexes[currentSoundtrackIndex];
+      if (typeof saved.volume === 'number') {
+        audio.volume = Math.min(1, Math.max(0, saved.volume));
+        if (audio.volume > 0) previousVolume = audio.volume;
+      }
+      if (typeof saved.muted === 'boolean') audio.muted = saved.muted;
+    } catch {
+      // Повреждённое локальное состояние не мешает работе проигрывателя.
+    }
+
+    const rememberCurrentPosition = () => {
+      const position = Number.isFinite(pendingSeekTime) ? pendingSeekTime : audio.currentTime;
+      if (!hasSelectedTrack || !Number.isFinite(position) || position < 0) return;
+      const soundtrack = soundtracks[currentSoundtrackIndex];
+      if (!soundtrack) return;
+      savedSoundtrackResumes[soundtrack.id] = { track: currentIndex, position };
+    };
+    const persist = () => {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({
+          track: savedTrackIndexes[0],
+          soundtrackTracks: savedTrackIndexes,
+          soundtrackResumes: savedSoundtrackResumes,
+          volume: audio.volume,
+          muted: audio.muted,
+        }));
+      } catch {}
+    };
+    const save = () => {
+      rememberCurrentPosition();
+      persist();
+    };
+    const formatTime = (seconds) => {
+      if (!Number.isFinite(seconds) || seconds < 0) return '—:—';
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+    };
+    const declaredDuration = (track) => {
+      const analyzedDuration = Number(track?.behavior?.source?.durationSec);
+      if (Number.isFinite(analyzedDuration) && analyzedDuration > 0) return analyzedDuration;
+      const [minutes = 0, seconds = 0] = String(track?.duration || '').split(':').map(Number);
+      const parsedDuration = (minutes * 60) + seconds;
+      return Number.isFinite(parsedDuration) && parsedDuration > 0 ? parsedDuration : 0;
+    };
+    const selectedTrack = () => soundtracks[currentSoundtrackIndex]?.tracks[currentIndex];
+    const trackSource = (track) => {
+      if (audioQuality === 'original' || !audioQualityRegistry.previewTracks.includes(track.file)) return track.src;
+      const bitrate = audioQuality.replace('opus-', '');
+      return track.src.replace(/[^/]+\.ogg$/i, `opus-preview/${track.file.replace(/\.ogg$/i, '')}-${bitrate}.opus`);
+    };
+    const selectedDuration = () => {
+      const mediaDuration = Number(audio.duration);
+      return Number.isFinite(mediaDuration) && mediaDuration > 0
+        ? mediaDuration
+        : declaredDuration(selectedTrack());
+    };
+    let seeking = false;
+    const setTrackTheme = (theme, intro = false) => {
+      const nextTheme = typeof theme === 'string' ? theme : '';
+      if (requestedTheme === nextTheme) return;
+      requestedTheme = nextTheme;
+      document.dispatchEvent(new CustomEvent('portal:theme-source', {
+        detail: { source: 'music-player', kind: 'music', theme: nextTheme, active: Boolean(nextTheme), intro: Boolean(nextTheme && intro) },
+      }));
+    };
+    const updateTransport = () => {
+      const total = selectedDuration();
+      const playbackTime = Number.isFinite(pendingSeekTime) ? pendingSeekTime : audio.currentTime;
+      const muted = audio.muted || audio.volume === 0;
+      const audible = !audio.paused && !muted;
+      const trackTheme = audible ? player.dataset.musicTheme || '' : '';
+      const playIntro = Boolean(trackTheme && themeIntroPending);
+      setTrackTheme(trackTheme, playIntro);
+      if (playIntro) themeIntroPending = false;
+      playToggle.classList.toggle('is-playing', !audio.paused);
+      playToggle.setAttribute('aria-label', audio.paused ? labels.play : labels.pause);
+      player.classList.toggle('is-playing', audible);
+      player.classList.toggle('is-muted', muted);
+      player.classList.toggle('is-paused', audio.paused && hasStarted);
+      currentTime.textContent = formatTime(playbackTime);
+      duration.textContent = formatTime(total);
+      seek.max = String(total);
+      if (!seeking) seek.value = String(Math.min(playbackTime, total || 0));
+      const seekProgress = total > 0 ? (playbackTime / total) * 100 : 0;
+      seek.style.setProperty('--range-progress', `${seekProgress}%`);
+      volume.value = String(audio.volume);
+      volume.style.setProperty('--range-progress', `${audio.volume * 100}%`);
+      muteToggle.classList.toggle('is-muted', muted);
+      muteToggle.setAttribute('aria-label', muted ? labels.unmute : labels.mute);
+    };
+    const applyLanguage = () => {
+      const locale = document.documentElement.lang.toLowerCase();
+      labels = musicLocales[locale] || musicLocales[locale.split('-')[0]] || musicLocales[defaultLocale];
+      const soundtrackChoice = player.querySelector('[data-music-soundtrack-choice]');
+      soundtrackChoice?.setAttribute('aria-label', labels.soundtrackChoice);
+      const orderHelp = player.querySelector('[data-music-order-help]');
+      if (orderHelp instanceof HTMLElement) orderHelp.textContent = labels.soundtrackOrderHint;
+      player.querySelector('.portal-music__transport')?.setAttribute('aria-label', labels.transport);
+      seek.setAttribute('aria-label', labels.seek);
+      volume.setAttribute('aria-label', labels.volume);
+      const volumeTitle = player.querySelector('.portal-music__volume .sr-only');
+      if (volumeTitle instanceof HTMLElement) volumeTitle.textContent = labels.volume;
+      previous?.setAttribute('aria-label', labels.previous);
+      next?.setAttribute('aria-label', labels.next);
+      if (playlistToggle instanceof HTMLButtonElement) {
+        const playlistLabel = playlistToggle.querySelector('[data-music-playlist-label]');
+        if (playlistLabel instanceof HTMLElement) playlistLabel.textContent = labels.tracks;
+      }
+      soundtrackPlaylists.forEach((soundtrackPlaylist, index) => {
+        const soundtrackTitle = labels.soundtrackTitles?.[index] || soundtracks[index].title;
+        soundtrackPlaylist.setAttribute('aria-label', labels.playlist.replace('{title}', soundtrackTitle));
+      });
+      soundtrackButtons.forEach((button, index) => {
+        const title = button.querySelector('[data-music-soundtrack-title]');
+        const soundtrackTitle = labels.soundtrackTitles?.[index] || soundtracks[index].title;
+        if (title instanceof HTMLElement) title.textContent = soundtrackTitle;
+        if (button instanceof HTMLButtonElement) {
+          button.dataset.musicOrderActionLabel = `${soundtrackTitle}. ${labels.soundtrackOrderAction}`;
+          button.dataset.musicOrderFirstLabel = `${soundtrackTitle}. ${labels.soundtrackOrderFirst}`;
+          button.title = labels.soundtrackOrderHint;
+          button.setAttribute('aria-label', button.dataset.musicOrderPosition === '0'
+            ? button.dataset.musicOrderFirstLabel
+            : button.dataset.musicOrderActionLabel);
+        }
+      });
+      updateTransport();
+    };
+    player.addEventListener('portal:music-language', applyLanguage);
+    applyLanguage();
+    let playlistRowCapacity = Number.parseInt(player.dataset.musicPlaylistRows || '12',10);
+    const setPlaylistOpen = (open) => {
+      if (!(playlist instanceof HTMLElement) || !(playlistToggle instanceof HTMLButtonElement)) return;
+      const nextOpen = open && playlistRowCapacity > 0;
+      playlist.hidden = !nextOpen;
+      playlistToggle.setAttribute('aria-expanded', String(nextOpen));
+      soundtrackPlaylists.forEach((soundtrackPlaylist, soundtrackIndex) => {
+        if (soundtrackPlaylist instanceof HTMLElement) soundtrackPlaylist.hidden = soundtrackIndex !== currentSoundtrackIndex;
+      });
+      requestAnimationFrame(() => player.dispatchEvent(new CustomEvent('portal:music-playlist-scrollbar')));
+    };
+    const applyPlaylistCapacity = (event) => {
+      if (!(playlistToggle instanceof HTMLButtonElement)) return;
+      const rows = Number.parseInt(String(event.detail?.rows ?? player.dataset.musicPlaylistRows ?? 12),10);
+      playlistRowCapacity = Number.isFinite(rows) ? Math.min(12,Math.max(0,rows)) : 12;
+      if (playlistRowCapacity === 0 && playlist?.hidden === false) setPlaylistOpen(false);
+    };
+    let playlistScrollbarFrame = 0;
+    const activePlaylist = () => soundtrackPlaylists.find((soundtrackPlaylist) => soundtrackPlaylist instanceof HTMLElement && !soundtrackPlaylist.hidden);
+    const syncPlaylistScrollbar = () => {
+      playlistScrollbarFrame = 0;
+      const soundtrackPlaylist = activePlaylist();
+      if (!(soundtrackPlaylist instanceof HTMLElement)
+        || !(playlistScrollbar instanceof HTMLElement)
+        || !(playlistScrollbarThumb instanceof HTMLElement)
+        || playlist?.hidden !== false) {
+        if (playlistScrollbar instanceof HTMLElement) playlistScrollbar.hidden = true;
+        return;
+      }
+      const viewport = soundtrackPlaylist.clientHeight;
+      const content = soundtrackPlaylist.scrollHeight;
+      const scrollable = content > viewport + 1;
+      playlistScrollbar.hidden = !scrollable;
+      if (!scrollable) return;
+      const thumbHeight = Math.max(30,(viewport / content) * viewport);
+      const travel = Math.max(0,viewport - thumbHeight);
+      const scrollRange = Math.max(1,content - viewport);
+      const thumbTop = (soundtrackPlaylist.scrollTop / scrollRange) * travel;
+      playlistScrollbarThumb.style.height = `${thumbHeight}px`;
+      playlistScrollbarThumb.style.transform = `translateY(${thumbTop}px)`;
+    };
+    const schedulePlaylistScrollbar = () => {
+      if (!playlistScrollbarFrame) playlistScrollbarFrame = requestAnimationFrame(syncPlaylistScrollbar);
+    };
+    player.addEventListener('portal:music-playlist-scrollbar',schedulePlaylistScrollbar);
+    soundtrackPlaylists.forEach((soundtrackPlaylist) => soundtrackPlaylist.addEventListener('scroll',schedulePlaylistScrollbar,{ passive:true }));
+    if (playlistScrollbar instanceof HTMLElement && playlistScrollbarThumb instanceof HTMLElement) {
+      let dragStartY = 0;
+      let dragStartScroll = 0;
+      playlistScrollbarThumb.addEventListener('pointerdown',(event) => {
+        const soundtrackPlaylist = activePlaylist();
+        if (!(soundtrackPlaylist instanceof HTMLElement)) return;
+        dragStartY = event.clientY;
+        dragStartScroll = soundtrackPlaylist.scrollTop;
+        playlistScrollbarThumb.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+      playlistScrollbarThumb.addEventListener('pointermove',(event) => {
+        if (!playlistScrollbarThumb.hasPointerCapture(event.pointerId)) return;
+        const soundtrackPlaylist = activePlaylist();
+        if (!(soundtrackPlaylist instanceof HTMLElement)) return;
+        const thumbHeight = playlistScrollbarThumb.offsetHeight;
+        const travel = Math.max(1,soundtrackPlaylist.clientHeight - thumbHeight);
+        const scrollRange = Math.max(0,soundtrackPlaylist.scrollHeight - soundtrackPlaylist.clientHeight);
+        soundtrackPlaylist.scrollTop = dragStartScroll + ((event.clientY - dragStartY) * scrollRange / travel);
+      });
+      playlistScrollbar.addEventListener('pointerdown',(event) => {
+        if (event.target === playlistScrollbarThumb) return;
+        const soundtrackPlaylist = activePlaylist();
+        if (!(soundtrackPlaylist instanceof HTMLElement)) return;
+        const thumbHeight = playlistScrollbarThumb.offsetHeight;
+        const travel = Math.max(1,soundtrackPlaylist.clientHeight - thumbHeight);
+        const scrollRange = Math.max(0,soundtrackPlaylist.scrollHeight - soundtrackPlaylist.clientHeight);
+        soundtrackPlaylist.scrollTop = Math.max(0,Math.min(scrollRange,(event.offsetY - (thumbHeight / 2)) * scrollRange / travel));
+      });
+    }
+    new ResizeObserver(schedulePlaylistScrollbar).observe(player);
+    player.addEventListener('portal:music-playlist-capacity', applyPlaylistCapacity);
+    applyPlaylistCapacity(new CustomEvent('portal:music-playlist-capacity'));
+    const sectionLevelAt = (time, visualization) => {
+      const sections = Array.isArray(visualization?.sections) ? visualization.sections : [];
+      let level = 0;
+      sections.forEach((section) => {
+        const start = Number(section?.start);
+        const end = Number(section?.end);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || time < start || time > end) return;
+        const fade = Math.max(.01, Number(section?.fade) || .42);
+        const edge = Math.min(1, (time - start) / fade, (end - time) / fade);
+        level = Math.max(level, Math.max(0, edge) * (Number(section?.level) || 1));
+      });
+      return Math.min(1, level);
+    };
+    const accentLevelAt = (time, accents, duration = .34) => {
+      if (!Array.isArray(accents)) return 0;
+      let level = 0;
+      accents.forEach((accent) => {
+        const elapsed = time - Number(accent);
+        if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > duration) return;
+        const remaining = 1 - (elapsed / duration);
+        level = Math.max(level, remaining * remaining * (3 - (2 * remaining)));
+      });
+      return level;
+    };
+    const approvedTiming = (track) => {
+      const timing = track?.behavior?.timing;
+      const legacy = track?.visualization;
+      return {
+        bpm: timing ? (timing.beat?.approved ? timing.beat.bpm : undefined) : legacy?.bpm,
+        sections: timing ? (timing.sections?.approved ? timing.sections.items : undefined) : legacy?.sections,
+        crashes: timing ? (timing.crashes?.approved ? timing.crashes.times : undefined) : legacy?.crashes,
+      };
+    };
+    const normalized = (value, fallback = 0) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.min(1, Math.max(0, number)) : fallback;
+    };
+    const setVisualLevels = (low = 0, mid = 0, high = 0) => {
+      player.style.setProperty('--music-low', low.toFixed(3));
+      player.style.setProperty('--music-mid', mid.toFixed(3));
+      player.style.setProperty('--music-high', high.toFixed(3));
+      const energy = Math.min(1, ((low * .5) + (mid * .32) + (high * .18)) * 2.8);
+      const track = soundtracks[currentSoundtrackIndex]?.tracks[currentIndex];
+      const timing = approvedTiming(track);
+      const behavior = track?.behavior;
+      const absolutePower = normalized(behavior?.mastering?.absolutePower, .7);
+      const density = normalized(behavior?.character?.density, .5);
+      const brightness = normalized(behavior?.character?.brightness, .5);
+      const driftCharacter = normalized(behavior?.motion?.drift, .35);
+      const impulseCharacter = normalized(behavior?.motion?.impulse, .5);
+      const shimmerCharacter = normalized(behavior?.motion?.shimmer, .5);
+      let onsetLevel = 0;
+      if (low === 0 && mid === 0 && high === 0) {
+        lowBaseline = .08;
+        beatLevel = 0;
+        driveLevel = 0;
+        beatDirection = 1;
+        beatLatched = false;
+        crashLevel = 0;
+      } else {
+        const onset = Math.max(0, low - lowBaseline);
+        onsetLevel = Math.min(1, onset * 6.5);
+        lowBaseline = (lowBaseline * .96) + (low * .04);
+        beatLevel = Math.min(1, Math.max(beatLevel * .8, onset * 6.5, low * .28));
+        const driveTarget = Array.isArray(timing.sections)
+          ? sectionLevelAt(audio.currentTime, timing)
+          : Math.min(1, Math.max(0, (energy - .72) * 2.4));
+        const driveRate = driveTarget > driveLevel ? .22 : .09;
+        driveLevel += (driveTarget - driveLevel) * driveRate;
+        crashLevel = accentLevelAt(audio.currentTime, timing.crashes);
+      }
+      const impact = Math.min(1, beatLevel * driveLevel);
+      const nextBeatLatched = beatLevel > .42;
+      if (nextBeatLatched && !beatLatched) beatDirection *= -1;
+      beatLatched = nextBeatLatched;
+      const spectrumShift = Math.max(-22, Math.min(22, (high - low) * 34 + (mid - .2) * 8));
+      const bpm = Number(timing.bpm) || 120;
+      const wavePhase = audio.currentTime * (bpm / 60) * Math.PI * 2;
+      const driftPhase = audio.currentTime * (.22 + (driftCharacter * .22)) * Math.PI * 2;
+      const power = absolutePower * (.34 + (energy * .66));
+      const drift = Math.sin(driftPhase) * driftCharacter * (.22 + (energy * .78));
+      const impulse = beatLevel * impulseCharacter * (.45 + (absolutePower * .55));
+      const shimmer = Math.min(1, ((high * .72) + (energy * .28)) * shimmerCharacter * (1 + (brightness * .3)));
+      const frame = {
+        energy,
+        'low-global': low,
+        'mid-global': mid,
+        'high-global': high,
+        beat: beatLevel,
+        drive: driveLevel,
+        impact,
+        crash: crashLevel,
+        'beat-direction': beatDirection,
+        'low-reactive': low * driveLevel,
+        'mid-reactive': mid * driveLevel,
+        'high-reactive': high * driveLevel,
+        'spectrum-shift': spectrumShift,
+        'pulse-wave': Number.isFinite(Number(timing.bpm)) ? Math.sin(wavePhase) * beatLevel : beatLevel * beatDirection,
+        'orbit-one-turn': (audio.currentTime / 5.2) % 1,
+        'orbit-two-turn': -((audio.currentTime / 7.4) % 1),
+        'signal-fault': track?.danceProfile ? Math.min(1, crashLevel + (high * driveLevel * shimmerCharacter * .45)) : 0,
+        power,
+        drift,
+        impulse,
+        shimmer,
+        density: density * (.28 + (energy * .72)),
+        brightness: brightness * (.32 + (high * .68)),
+        'character-low': normalized(behavior?.character?.low, .5),
+        'character-mid': normalized(behavior?.character?.mid, .5),
+        'character-high': normalized(behavior?.character?.high, .5),
+      };
+      for (let index = 0; index < 11; index += 1) {
+        const wave = Math.sin(wavePhase - (index * Math.PI * .72)) * impact;
+        frame[`wave-${index}`] = wave;
+      }
+      document.dispatchEvent(new CustomEvent('portal:music-frame', {
+        detail: {
+          audible: !audio.paused && !audio.muted && audio.volume > 0,
+          active: !audio.paused && !audio.muted && audio.volume > 0 && !reducedMotion.matches,
+          danceProfile: typeof track?.danceProfile === 'string' ? track.danceProfile : '',
+          trackId: typeof track?.file === 'string' ? track.file.replace(/\.ogg$/i, '') : '',
+          sourceSha256: typeof behavior?.source?.sha256 === 'string' ? behavior.source.sha256 : '',
+          time: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+          duration: Number.isFinite(audio.duration) ? audio.duration : behavior?.source?.durationSec,
+          signal: { low, mid, high, energy, onset: onsetLevel },
+          character: {
+            power: absolutePower,
+            density,
+            brightness,
+            drift: driftCharacter,
+            impulse: impulseCharacter,
+            shimmer: shimmerCharacter,
+          },
+          frame,
+        },
+      }));
+    };
+    const averageRange = (values, start, end) => {
+      let total = 0;
+      const safeEnd = Math.min(end, values.length);
+      for (let index = start; index < safeEnd; index += 1) total += values[index];
+      return total / Math.max(1, safeEnd - start) / 255;
+    };
+    const stopVisualizer = () => {
+      if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
+      visualizerFrame = undefined;
+      setVisualLevels();
+    };
+    const ensureAudioGraph = async () => {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return false;
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 128;
+        analyser.smoothingTimeConstant = .72;
+        audioSource = audioContext.createMediaElementSource(audio);
+        audioSource.connect(analyser);
+        analyser.connect(audioContext.destination);
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+      }
+      if (audioContext.state === 'suspended') await audioContext.resume();
+      return true;
+    };
+    const startVisualizer = async () => {
+      if (reducedMotion.matches) return;
+      try {
+        if (!await ensureAudioGraph()) return;
+        const renderLevels = () => {
+          if (!analyser || !frequencyData || audio.paused) return stopVisualizer();
+          analyser.getByteFrequencyData(frequencyData);
+          setVisualLevels(
+            averageRange(frequencyData, 0, 8),
+            averageRange(frequencyData, 8, 28),
+            averageRange(frequencyData, 28, 58),
+          );
+          visualizerFrame = requestAnimationFrame(renderLevels);
+        };
+        if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
+        renderLevels();
+      } catch {
+        player.classList.add('uses-fallback-visualizer');
+      }
+    };
+    const syncVisualizer = () => {
+      if (!danceEnabled || audio.paused || audio.muted || audio.volume === 0) stopVisualizer();
+      else startVisualizer();
+    };
+    const selectTrack = (index, resume = false, rememberPrevious = true, alreadyPaused = false) => {
+      if (rememberPrevious) rememberCurrentPosition();
+      if (!alreadyPaused) audio.pause();
+      const tracks = soundtracks[currentSoundtrackIndex].tracks;
+      currentIndex = (index + tracks.length) % tracks.length;
+      savedTrackIndexes[currentSoundtrackIndex] = currentIndex;
+      const track = tracks[currentIndex];
+      const soundtrackId = soundtracks[currentSoundtrackIndex].id;
+      const savedResume = savedSoundtrackResumes[soundtrackId];
+      const restorePosition = savedResume?.track === currentIndex ? Number(savedResume.position) || 0 : 0;
+      savedSoundtrackResumes[soundtrackId] = { track: currentIndex, position: restorePosition };
+      const loadToken = ++trackLoadToken;
+      pendingSeekTime = null;
+      if ('theme' in track && typeof track.theme === 'string') player.dataset.musicTheme = track.theme;
+      else delete player.dataset.musicTheme;
+      themeIntroPending = true;
+      audio.addEventListener('loadedmetadata', () => {
+        if (loadToken !== trackLoadToken) return;
+        const total = selectedDuration();
+        const requestedTime = Number.isFinite(pendingSeekTime) ? pendingSeekTime : restorePosition;
+        const restoredTime = total > 0 && requestedTime >= total - .75
+          ? 0
+          : Math.min(requestedTime, Math.max(0, total - .05));
+        try { audio.currentTime = restoredTime; } catch {}
+        pendingSeekTime = null;
+        updateTransport();
+      }, { once: true });
+      audio.src = trackSource(track);
+      audio.load();
+      hasSelectedTrack = true;
+      seek.value = '0';
+      seek.max = String(declaredDuration(track));
+      currentTime.textContent = '0:00';
+      duration.textContent = formatTime(declaredDuration(track));
+      title.textContent = track.title;
+      if (playlistCounter instanceof HTMLElement) playlistCounter.textContent = `${currentIndex + 1} / ${tracks.length}`;
+      trackButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+        const buttonSoundtrack = Number(button.dataset.musicTrackSoundtrack);
+        const buttonTrack = Number(button.dataset.musicTrack);
+        button.setAttribute('aria-pressed', String(buttonSoundtrack === currentSoundtrackIndex && buttonTrack === currentIndex));
+      });
+      persist();
+      if (resume) audio.play().catch(() => undefined);
+    };
+    const selectSoundtrack = (index, resume = false, trackIndex) => {
+      rememberCurrentPosition();
+      audio.pause();
+      currentSoundtrackIndex = (index + soundtracks.length) % soundtracks.length;
+      const soundtrack = soundtracks[currentSoundtrackIndex];
+      soundtrackButtons.forEach((button, buttonIndex) => {
+        if (button instanceof HTMLButtonElement) button.setAttribute('aria-pressed', String(buttonIndex === currentSoundtrackIndex));
+      });
+      soundtrackPlaylists.forEach((soundtrackPlaylist, soundtrackIndex) => {
+        if (soundtrackPlaylist instanceof HTMLElement) soundtrackPlaylist.hidden = soundtrackIndex !== currentSoundtrackIndex;
+      });
+      const targetTrackIndex = Number.isInteger(trackIndex) ? trackIndex : savedTrackIndexes[currentSoundtrackIndex];
+      selectTrack(targetTrackIndex, resume, false, true);
+    };
+    const playImmediately = () => audio.play().catch(() => undefined);
+    const pauseImmediately = () => {
+      save();
+      audio.pause();
+    };
+    const selectTrackImmediately = (index) => {
+      const resume = !audio.paused;
+      selectTrack(index, false);
+      if (resume) playImmediately();
+    };
+    const selectSoundtrackImmediately = (index, trackIndex) => {
+      const resume = !audio.paused;
+      selectSoundtrack(index, false, trackIndex);
+      if (resume) playImmediately();
+    };
+
+    panel.hidden = false;
+    panel.classList.add('is-mounted', 'is-visible');
+    panel.setAttribute('aria-hidden', 'false');
+    panel.removeAttribute('inert');
+    player.classList.add('is-open');
+    selectSoundtrack(currentSoundtrackIndex);
+    updateTransport();
+    playlistToggle?.addEventListener('click', () => {
+      applyPlaylistCapacity(new CustomEvent('portal:music-playlist-capacity'));
+      setPlaylistOpen(playlist?.hidden !== false);
+      schedulePlaylistScrollbar();
+    });
+    soundtrackButtons.forEach((button, index) => button.addEventListener('click', () => {
+      if (index === currentSoundtrackIndex) return;
+      selectSoundtrackImmediately(index);
+    }));
+    document.addEventListener('portal:music-soundtrack-order-change', (event) => {
+      const firstSoundtrackId = event.detail?.order?.[0];
+      const firstSoundtrackIndex = soundtracks.findIndex((soundtrack) => soundtrack.id === firstSoundtrackId);
+      if (firstSoundtrackIndex < 0 || firstSoundtrackIndex === currentSoundtrackIndex) return;
+      selectSoundtrackImmediately(firstSoundtrackIndex);
+    });
+    document.addEventListener('portal:music-audio-quality-change', (event) => {
+      const nextQuality = event.detail?.quality;
+      if (!qualityIds.includes(nextQuality) || nextQuality === audioQuality) return;
+      const resume = !audio.paused;
+      soundtracks.forEach((soundtrack, soundtrackIndex) => {
+        savedSoundtrackResumes[soundtrack.id] = {
+          track: savedTrackIndexes[soundtrackIndex],
+          position: 0,
+        };
+      });
+      audioQuality = nextQuality;
+      selectTrack(currentIndex, resume, false);
+    });
+    document.addEventListener('portal:music-dance-change', (event) => {
+      danceEnabled = event.detail?.enabled === true;
+      if (danceEnabled) {
+        if (!audio.paused) window.setTimeout(syncVisualizer, 0);
+      } else {
+        stopVisualizer();
+        audioContext?.suspend().catch(() => undefined);
+      }
+    });
+    previous?.addEventListener('click', () => selectTrackImmediately(currentIndex - 1));
+    next?.addEventListener('click', () => selectTrackImmediately(currentIndex + 1));
+    playToggle.addEventListener('click', () => {
+      if (audio.paused) playImmediately();
+      else pauseImmediately();
+    });
+    seek.addEventListener('input', () => {
+      seeking = true;
+      currentTime.textContent = formatTime(Number(seek.value));
+    });
+    seek.addEventListener('change', () => {
+      const total = selectedDuration();
+      const requestedTime = Math.min(Math.max(0, Number(seek.value) || 0), total || 0);
+      if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        try { audio.currentTime = requestedTime; } catch { pendingSeekTime = requestedTime; }
+      } else {
+        pendingSeekTime = requestedTime;
+      }
+      const soundtrack = soundtracks[currentSoundtrackIndex];
+      if (soundtrack) savedSoundtrackResumes[soundtrack.id] = { track: currentIndex, position: requestedTime };
+      seeking = false;
+      updateTransport();
+      persist();
+    });
+    muteToggle.addEventListener('click', () => {
+      if (audio.muted || audio.volume === 0) {
+        if (audio.volume === 0) audio.volume = previousVolume;
+        audio.muted = false;
+      } else {
+        previousVolume = audio.volume;
+        audio.muted = true;
+      }
+      save();
+      updateTransport();
+    });
+    volume.addEventListener('input', () => {
+      const nextVolume = Number(volume.value);
+      audio.volume = nextVolume;
+      if (nextVolume > 0) {
+        previousVolume = nextVolume;
+        audio.muted = false;
+      }
+    });
+    trackButtons.forEach((button) => button.addEventListener('click', () => {
+      const soundtrackIndex = Number(button.dataset.musicTrackSoundtrack);
+      const trackIndex = Number(button.dataset.musicTrack);
+      if (soundtrackIndex !== currentSoundtrackIndex) selectSoundtrackImmediately(soundtrackIndex, trackIndex);
+      else selectTrackImmediately(trackIndex);
+      setPlaylistOpen(false);
+    }));
+    audio.addEventListener('play', () => {
+      hasStarted = true;
+      player.classList.add('has-started');
+      updateTransport();
+      if (danceEnabled) window.setTimeout(syncVisualizer, 0);
+      document.querySelectorAll('audio').forEach((otherAudio) => {
+        if (otherAudio !== audio) otherAudio.pause();
+      });
+    });
+    audio.addEventListener('pause', () => {
+      persist();
+      updateTransport();
+      stopVisualizer();
+    });
+    audio.addEventListener('loadedmetadata', updateTransport);
+    audio.addEventListener('durationchange', updateTransport);
+    audio.addEventListener('timeupdate', () => {
+      updateTransport();
+      if (Math.abs(audio.currentTime - lastPositionPersistedAt) < 5) return;
+      lastPositionPersistedAt = audio.currentTime;
+      save();
+    });
+    audio.addEventListener('volumechange', () => { save(); updateTransport(); syncVisualizer(); });
+    audio.addEventListener('ended', () => {
+      const soundtrackId = soundtracks[currentSoundtrackIndex].id;
+      savedSoundtrackResumes[soundtrackId] = { track: currentIndex, position: 0 };
+      persist();
+      selectTrack(currentIndex + 1, false, false);
+      playImmediately();
+    });
+    window.addEventListener('pagehide', save);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setPlaylistOpen(false);
+    });
+    document.addEventListener('portal:close-music', () => {
+      setPlaylistOpen(false);
+    });
+  }
+
+  document.addEventListener('astro:page-load', initPortalMusicPlayer);
+  initPortalMusicPlayer();
+})();</script><script type="module">var e,t=(e,t)=>{let n=Array.isArray(e)?e.filter(e=>typeof e==`string`&&t.includes(e)):[];return[...new Set([...n,...t])]},n=(e,n)=>{try{return t(JSON.parse(localStorage.getItem(e)||`[]`),n)}catch{return[...n]}};function r(){e?.abort(),e=new AbortController;let{signal:r}=e,i=document.querySelector(`[data-portal-music]`);if(!i)return;let a=[...i.querySelectorAll(`[data-music-soundtrack][data-music-soundtrack-id]`)],o=[...i.querySelectorAll(`[data-music-soundtrack-playlist][data-music-soundtrack-id]`)],s=[...document.querySelectorAll(`[data-music-order-option][data-music-soundtrack-id]`)];if(!a.length)return;let c=a.map(e=>e.dataset.musicSoundtrackId||``).filter(Boolean),l=i.dataset.musicSoundtrackOrderKey||`reality413-music-soundtrack-order`,u=i.querySelector(`[data-music-order-status]`),d=[a,s].filter(e=>e.length),f=n(l,c),p,m=()=>{d.forEach(e=>{let t=e[0]?.parentElement;t&&(f.forEach(n=>{let r=e.find(e=>e.dataset.musicSoundtrackId===n);r&&t.append(r)}),e.forEach(e=>{let t=f.indexOf(e.dataset.musicSoundtrackId||``);if(e.dataset.musicOrderPosition=String(t),e.dataset.musicOrderFirst=String(t===0),e.hasAttribute(`data-music-soundtrack`)){let n=t===0?e.dataset.musicOrderFirstLabel:e.dataset.musicOrderActionLabel;n&&e.setAttribute(`aria-label`,n)}}))});let e=o[0]?.parentElement;e&&(f.forEach(t=>{let n=o.find(e=>e.dataset.musicSoundtrackId===t);n&&e.append(n)}),o.forEach(e=>{e.dataset.musicOrderPosition=String(f.indexOf(e.dataset.musicSoundtrackId||``))}))},h=(e,n=!0)=>{f=t(e,c);try{localStorage.setItem(l,JSON.stringify(f))}catch{}if(m(),n&&u){let e=a.find(e=>e.dataset.musicSoundtrackId===f[0]);u.textContent=e?.dataset.musicOrderFirstLabel||``}document.dispatchEvent(new CustomEvent(`portal:music-soundtrack-order-change`,{detail:{order:[...f]}}))},g=(e,t)=>{let n=f.indexOf(e),r=Math.max(0,Math.min(f.length-1,t));if(n<0||n===r)return!1;let i=[...f];return i.splice(n,1),i.splice(r,0,e),h(i),!0};d.flat().forEach(e=>{let t=-1,n=0,i=0,o=0,c=0,l=!1,u=-1,m=()=>e.hasAttribute(`data-music-soundtrack`)?a:s,h=()=>{e.classList.remove(`is-soundtrack-order-dragging`),d.flat().forEach(e=>delete e.dataset.musicOrderTarget),l=!1,u=-1},_=()=>{let t=o-n,r=c-i;if(!l&&(Math.abs(t)<10||Math.abs(t)<=Math.abs(r)))return;l=!0,e.classList.add(`is-soundtrack-order-dragging`);let a=m(),s=f.indexOf(e.dataset.musicSoundtrackId||``),d=document.elementFromPoint(o,c)?.closest(`[data-music-soundtrack-id]`),p=d&&a.includes(d)&&d.dataset.musicSoundtrackId||``;u=p&&p!==e.dataset.musicSoundtrackId?f.indexOf(p):Math.max(0,Math.min(f.length-1,s+Math.sign(t))),a.forEach(e=>{e.dataset.musicOrderTarget=String(f.indexOf(e.dataset.musicSoundtrackId||``)===u)})};e.addEventListener(`pointerdown`,r=>{!r.isPrimary||r.button!==0||(t=r.pointerId,n=o=r.clientX,i=c=r.clientY,e.setPointerCapture(t))},{signal:r}),e.addEventListener(`pointermove`,e=>{e.pointerId===t&&(o=e.clientX,c=e.clientY,_())},{signal:r}),e.addEventListener(`pointerup`,n=>{if(n.pointerId!==t)return;t=-1;let r=l&&u>=0,i=u;h(),!(!r||!g(e.dataset.musicSoundtrackId||``,i))&&(p=e,n.preventDefault(),window.setTimeout(()=>{p===e&&(p=void 0)}))},{signal:r}),e.addEventListener(`pointercancel`,()=>{t=-1,h()},{signal:r}),e.addEventListener(`click`,t=>{p===e&&(t.preventDefault(),t.stopImmediatePropagation(),p=void 0)},{capture:!0,signal:r}),e.addEventListener(`keydown`,t=>{if(!t.altKey||![`ArrowLeft`,`ArrowRight`].includes(t.key))return;let n=f.indexOf(e.dataset.musicSoundtrackId||``),r=t.key===`ArrowLeft`?-1:1;t.preventDefault(),t.stopImmediatePropagation(),g(e.dataset.musicSoundtrackId||``,n+r),e.focus()},{signal:r})}),i.addEventListener(`portal:music-language`,m,{signal:r}),m()}document.addEventListener(`astro:page-load`,r),r();</script></div><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="sr-only">Open menu</span><span></span><span></span><span></span></button><nav class="main-nav" id="main-nav" aria-label="Main navigation"><div class="nav-group"><a class="nav-group__link" data-nav-key="games" href="/reality413universe-pages/en/games/"><span data-music-target="header.nav.links-a">Games</span></a><div class="nav-dropdown nav-dropdown--games" aria-label="Universe games"><a href="/reality413universe-pages/en/steam/" aria-label="Steam and rights"><strong>Steam and rights</strong></a><a href="/reality413universe-pages/en/games/paradise-cracked-2/" aria-label="Код доступа: РАЙ 2"><strong>Код доступа: РАЙ 2</strong></a><a href="/reality413universe-pages/en/games/paradise-cracked/" aria-label="Paradise Cracked"><strong>Paradise Cracked</strong></a><a href="/reality413universe-pages/en/games/paradise-cracked-remaster/" aria-label="Paradise Cracked Remaster"><strong>Paradise Cracked Remaster</strong></a><a href="/reality413universe-pages/en/games/cops-2170/" aria-label="The Power of Law"><strong>The Power of Law</strong></a><a href="/reality413universe-pages/en/games/cops-2170-police-stories/" aria-label="The Power of Law: Police Stories"><strong>The Power of Law: Police Stories</strong></a><a href="/reality413universe-pages/en/games/cops-2170-stormtrooper-notes/" aria-label="The Power of Law: The Stormtrooper's Notes"><strong>The Power of Law: The Stormtrooper's Notes</strong></a></div></div><div class="nav-group"><a class="nav-group__link" data-nav-key="vpforge" href="/reality413universe-pages/en/vpforge/"><span data-music-target="header.nav.links-b">VPForge</span></a><div class="nav-dropdown" aria-label="VPForge sections"><a href="/reality413universe-pages/en/vpforge/modding/" aria-label="Modding"><strong>Modding</strong></a><a href="/reality413universe-pages/en/vpforge/#vpe1" aria-label="VPE1"><strong>VPE1</strong></a><a href="/reality413universe-pages/en/vpforge/#vpe2" aria-label="VPE2"><strong>VPE2</strong></a><a href="/reality413universe-pages/en/vpforge/#plugins" aria-label="Plugins"><strong>Plugins</strong></a><a href="/reality413universe-pages/en/vpforge/#tools" aria-label="Tools"><strong>Tools</strong></a></div></div><div class="nav-group"><a class="nav-group__link" data-nav-key="wiki" href="/reality413universe-pages/en/wiki/"><span data-music-target="header.nav.links-c">Wiki</span></a><div class="nav-dropdown" aria-label="Wiki sections"><a href="/reality413universe-pages/en/wiki/games/paradise-cracked/" aria-label="Paradise Cracked"><strong>Paradise Cracked</strong></a><a href="/reality413universe-pages/en/wiki/games/paradise-cracked-remaster/" aria-label="Paradise Cracked Remaster"><strong>Paradise Cracked Remaster</strong></a><a href="/reality413universe-pages/en/wiki/games/cops-2170/" aria-label="The Power of Law"><strong>The Power of Law</strong></a><a href="/reality413universe-pages/en/wiki/games/cops-2170-police-stories/" aria-label="The Power of Law: Police Stories"><strong>The Power of Law: Police Stories</strong></a><a href="/reality413universe-pages/en/wiki/games/cops-2170-stormtrooper-notes/" aria-label="The Power of Law: The Stormtrooper's Notes"><strong>The Power of Law: The Stormtrooper's Notes</strong></a></div></div><div class="nav-group"><a class="nav-group__link" data-nav-key="chronicles" href="/reality413universe-pages/en/chronicles/"><span data-music-target="header.nav.links-a">Chronicles</span></a><div class="nav-dropdown" aria-label="Chronicles sections"><a href="/reality413universe-pages/en/chronicles/#истории" aria-label="Stories"><strong>Stories</strong></a><a href="/reality413universe-pages/en/chronicles/#приключения" aria-label="Adventures"><strong>Adventures</strong></a><a href="/reality413universe-pages/en/chronicles/#атмосфера" aria-label="Atmosphere"><strong>Atmosphere</strong></a></div></div><div class="nav-group"><a class="nav-group__link" data-nav-key="codex" href="/reality413universe-pages/en/codex/"><span data-music-target="header.nav.links-b">Codex</span></a><div class="nav-dropdown" aria-label="Codex sections"><a href="/reality413universe-pages/en/codex/#законы-и-термины" aria-label="Laws and terms"><strong>Laws and terms</strong></a><a href="/reality413universe-pages/en/codex/#события" aria-label="Events"><strong>Events</strong></a><a href="/reality413universe-pages/en/codex/#силы" aria-label="Forces"><strong>Forces</strong></a><a href="/reality413universe-pages/en/codex/#персонажи" aria-label="Characters"><strong>Characters</strong></a><a href="/reality413universe-pages/en/codex/#технологии" aria-label="Technology"><strong>Technology</strong></a></div></div><div class="nav-group nav-group--end"><a class="nav-group__link" data-nav-key="gallery" href="/reality413universe-pages/en/gallery/"><span data-music-target="header.nav.links-c">Gallery</span></a><div class="nav-dropdown" aria-label="Gallery sections"><a href="/reality413universe-pages/en/gallery/#sound-gallery" aria-label="Sound gallery"><strong>Sound gallery</strong></a><a href="/reality413universe-pages/en/gallery/#fanfics" aria-label="Fan fiction"><strong>Fan fiction</strong></a><a href="/reality413universe-pages/en/gallery/#thoughts" aria-label="Thoughts"><strong>Thoughts</strong></a><a href="/reality413universe-pages/en/gallery/#paintings" aria-label="Art"><strong>Art</strong></a></div></div><div class="nav-group nav-group--end"><a class="nav-group__link" data-nav-key="archive" href="/reality413universe-pages/en/archive/"><span data-music-target="header.nav.links-a">Archive</span></a><div class="nav-dropdown" aria-label="Archive sections"><a href="/reality413universe-pages/en/archive/#development-history" aria-label="Development history"><strong>Development history</strong></a><a href="/reality413universe-pages/en/archive/#reviews" aria-label="Reviews and criticism"><strong>Reviews and criticism</strong></a><a href="/reality413universe-pages/en/archive/#interviews" aria-label="Interviews"><strong>Interviews</strong></a><a href="/reality413universe-pages/en/archive/#press" aria-label="Press and publications"><strong>Press and publications</strong></a><a href="/reality413universe-pages/en/archive/pantheon-realnosti/" aria-label="Pantheon of Reality"><strong>Pantheon of Reality</strong></a></div></div><div class="news-control nav-group nav-group--end"><a data-nav-key="portal" href="/reality413universe-pages/en/portal/"><span data-music-target="header.nav.links-b">Portal</span></a><div class="nav-dropdown" aria-label="Portal sections"><a href="/reality413universe-pages/en/portal/#about" aria-label="About"><strong>About</strong></a><a href="/reality413universe-pages/en/portal/#news" aria-label="News"><strong>News</strong></a><a href="/reality413universe-pages/en/portal/#plans" aria-label="Development plans"><strong>Development plans</strong></a><a href="/reality413universe-pages/en/portal/#settings" aria-label="Settings"><strong>Settings</strong></a><a href="/reality413universe-pages/en/portal/#join" aria-label="Join"><strong>Join</strong></a><a href="/reality413universe-pages/en/portal/#support" aria-label="Support"><strong>Support</strong></a></div></div><div class="nav-group nav-group--end"><a class="download-link nav-group__link" data-nav-key="downloads" href="/reality413universe-pages/en/downloads/"><span>Download</span> <span data-music-target="header.nav.download-glyph" aria-hidden="true">↓</span></a><div class="nav-dropdown" aria-label="Download sections"><a href="/reality413universe-pages/en/downloads/#games" aria-label="Games and patches"><strong>Games and patches</strong></a><a href="/reality413universe-pages/en/downloads/#vpforge" aria-label="VPForge"><strong>VPForge</strong></a><a href="/reality413universe-pages/en/downloads/#documentation" aria-label="Documentation"><strong>Documentation</strong></a></div></div></nav></div><div class="header-workspace" role="region" aria-label="Контекст раздела"><div class="site-header__subnav header-workspace__row header-workspace__row--1" data-workspace-row="1" data-workspace-empty="false"><div class="site-header__subnav-inner header-workspace__shell"><div class="header-workspace__content"><div class="header-tabs" data-header-tabs="vpforge" data-header-tabs-variant="tabs" data-header-tabs-menu-default="Разделы VPForge"><button class="header-tabs__menu-toggle" type="button" aria-expanded="false" aria-controls="header-tabs-vpforge" data-header-tabs-menu-toggle=""><span data-header-tabs-menu-label="">VPForge</span><i aria-hidden="true">⌄</i></button><nav class="header-tabs__list" id="header-tabs-vpforge" aria-label="Разделы VPForge"><span class="header-tabs__side header-tabs__side--left" data-header-tabs-side="left"><button class="header-tabs__tab header-tabs__control header-system-control" type="button" data-vpforge-filter="modding" data-header-tab-id="modding" data-header-tab-order="1" data-header-tab-title="Моддинг" data-header-tab-description="Полные руководства по скриптам, материалам, моделям и игровым ресурсам «Код доступа: РАЙ» и «Власти Закона»." aria-pressed="false"><span class="header-tabs__label" data-header-tab-label="Моддинг"><span class="header-tabs__label-line">Modding</span></span></button><button class="header-tabs__tab header-tabs__control header-system-control" type="button" data-vpforge-filter="vpe1" data-header-tab-id="vpe1" data-header-tab-order="2" data-header-tab-title="VPE1" data-header-tab-description="Документация первого поколения игрового движка и его производственного конвейера." aria-pressed="false"><span class="header-tabs__label" data-header-tab-label="VPE1"><span class="header-tabs__label-line">VPE1</span></span></button><button class="header-tabs__tab header-tabs__control header-system-control" type="button" data-vpforge-filter="vpe2" data-header-tab-id="vpe2" data-header-tab-order="3" data-header-tab-title="VPE2" data-header-tab-description="Документация второго поколения движка и развитие технологий VPForge." aria-pressed="false"><span class="header-tabs__label" data-header-tab-label="VPE2"><span class="header-tabs__label-line">VPE2</span></span></button></span><span class="header-tabs__center" data-header-tabs-center=""><button class="header-tabs__section header-tabs__control header-system-control is-active" type="button" data-vpforge-show-all="" data-header-tab-root="" data-header-tab-order="0" data-header-tab-description="VPForge — кузница игр на движках VPE1 и VPE2: документация, экспортные плагины, инструменты и практический моддинг." data-header-tab-center="true" aria-pressed="true"><span class="header-tabs__label" data-header-tab-label="VPForge"><span class="header-tabs__label-line">VPForge</span></span></button></span><span class="header-tabs__side header-tabs__side--right" data-header-tabs-side="right"><button class="header-tabs__tab header-tabs__control header-system-control" type="button" data-vpforge-filter="plugins" data-header-tab-id="plugins" data-header-tab-order="4" data-header-tab-title="Плагины" data-header-tab-description="Экспортные плагины, интеграции и рабочий конвейер подготовки игровых ресурсов." aria-pressed="false"><span class="header-tabs__label" data-header-tab-label="Плагины"><span class="header-tabs__label-line">Plugins</span></span></button><button class="header-tabs__tab header-tabs__control header-system-control" type="button" data-vpforge-filter="tools" data-header-tab-id="tools" data-header-tab-order="5" data-header-tab-title="Инструменты" data-header-tab-description="Редакторы, утилиты и вспомогательные средства для разработки и модификации игр." aria-pressed="false"><span class="header-tabs__label" data-header-tab-label="Инструменты"><span class="header-tabs__label-line">Tools</span></span></button></span></nav></div><script type="module">var e;function t(e=``,t=!0){[...document.querySelectorAll(`[data-vpforge-card]`)].forEach(t=>{t.hidden=!!e&&t.dataset.vpforgeCard!==e});let n=[...document.querySelectorAll(`[data-header-tabs="vpforge"] [data-vpforge-filter]`)];n.forEach(t=>{let n=(t.dataset.vpforgeFilter??``)===e;t.classList.toggle(`is-active`,n),t.classList.toggle(`is-promoted`,n),t.setAttribute(`aria-pressed`,String(n))});let r=n.find(t=>t.dataset.vpforgeFilter===e),i=document.querySelector(`[data-vpforge-workspace-description]`),a=i?.dataset.vpforgeDefault??i?.textContent??``;i&&!i.dataset.vpforgeDefault&&(i.dataset.vpforgeDefault=a),i&&(i.textContent=r?.dataset.vpforgeDescription??a);let o=document.querySelector(`[data-vpforge-show-all]`);if(o?.classList.toggle(`is-active`,!e),o?.setAttribute(`aria-pressed`,String(!e)),t){let t=new URL(window.location.href);t.hash=e,history.replaceState(history.state,``,t)}}function n(){if(e?.abort(),!document.querySelector(`[data-vpforge-catalog]`))return;e=new AbortController;let{signal:n}=e;document.addEventListener(`click`,e=>{let n=e.target;if(!(n instanceof Element))return;let r=n.closest(`[data-header-tabs="vpforge"] [data-vpforge-filter]`),i=n.closest(`[data-vpforge-show-all]`);!r&&!i||(t(r?.dataset.vpforgeFilter??``),(r??i)?.blur())},{signal:n});let r=()=>{let e=decodeURIComponent(location.hash.slice(1));t([...document.querySelectorAll(`[data-header-tabs="vpforge"] [data-vpforge-filter]`)].some(t=>t.dataset.vpforgeFilter===e)?e:``,!1)};window.addEventListener(`hashchange`,r,{signal:n}),r()}document.addEventListener(`astro:page-load`,n),n();</script></div></div></div><div class="site-header__subnav site-header__subnav--row2 header-workspace__row header-workspace__row--2" data-workspace-row="2" data-workspace-empty="false"><div class="site-header__subnav-inner header-workspace__shell"><div class="header-workspace__content"><div class="header-workspace__description" data-header-tabs-description="vpforge" data-vpforge-workspace-description="">VPForge — кузница игр на движках VPE1 и VPE2: документация, экспортные плагины, инструменты и практический моддинг.</div></div></div></div><div class="site-header__subnav site-header__subnav--row3 header-workspace__row header-workspace__row--3" data-workspace-row="3" data-workspace-empty="false"><div class="site-header__subnav-inner header-workspace__shell"><div class="header-workspace__content"></div></div></div></div><script type="module" src="/reality413universe-pages/_astro/HeaderTabsRuntime.astro_astro_type_script_index_0_lang.CpCqKIYZ.js"></script></header><div class="portal-lightbox" data-portal-lightbox="" hidden="" role="dialog" aria-modal="true" aria-label="Увеличенное изображение"><div class="portal-lightbox__surface"><button class="portal-lightbox__close" type="button" data-portal-lightbox-close="" aria-label="Закрыть увеличенное изображение">×</button><div class="portal-lightbox__stage" data-portal-lightbox-stage=""><button class="portal-lightbox__nav portal-lightbox__nav--previous" type="button" data-portal-lightbox-previous="" aria-label="Предыдущее изображение">←</button><img class="portal-lightbox__image" data-portal-lightbox-image="" alt=""><button class="portal-lightbox__nav portal-lightbox__nav--next" type="button" data-portal-lightbox-next="" aria-label="Следующее изображение">→</button></div><div class="portal-lightbox__meta"><p class="portal-lightbox__caption" data-portal-lightbox-caption="" hidden=""></p><span class="portal-lightbox__counter" data-portal-lightbox-counter="" hidden=""></span><a class="portal-lightbox__source" data-portal-lightbox-source="" hidden="" target="_blank" rel="noopener noreferrer">Источник ↗</a></div></div></div><script data-astro-rerun="">
+(() => {
+  const lightboxRegistry = window;
+  lightboxRegistry.__reality413ImageLightboxController?.abort();
+  const controller = new AbortController();
+  const { signal } = controller;
+  lightboxRegistry.__reality413ImageLightboxController = controller;
+  const imageFilePattern = /\.(?:avif|gif|jpe?g|png|webp)$/i;
+  let activeItems = [];
+  let activeIndex = 0;
+  let pointerStartX = null;
+
+  function getLightboxTarget(target) {
+    if (!(target instanceof HTMLElement)) return null;
+    const anchorTarget = target.closest('a');
+    const thumbnail = target.closest('img') || anchorTarget?.querySelector('img');
+    if (!thumbnail || thumbnail.closest('.site-header, .site-footer, [data-no-lightbox]')) return null;
+
+    const anchor = thumbnail.closest('a');
+    if (anchor) {
+      const linkedImage = new URL(anchor.href, window.location.href);
+      if (!imageFilePattern.test(linkedImage.pathname)) return null;
+      return { thumbnail, trigger: anchor, imageUrl: linkedImage.href };
+    }
+
+    const source = thumbnail.currentSrc || thumbnail.src;
+    if (!source) return null;
+    return { thumbnail, trigger: thumbnail, imageUrl: new URL(source, window.location.href).href };
+  }
+
+  function describeItem(resolved) {
+    const figure = resolved.thumbnail.closest('figure');
+    const figureCaption = figure?.querySelector('figcaption')?.textContent?.trim();
+    return {
+      ...resolved,
+      caption: figure?.dataset.lightboxCaption?.trim() || figureCaption || resolved.thumbnail.alt,
+      sourceUrl: figure?.dataset.lightboxSource?.trim() || '',
+    };
+  }
+
+  function getGalleryItems(resolved) {
+    const gallery = resolved.trigger.closest('[data-lightbox-gallery]');
+    if (!gallery) return [describeItem(resolved)];
+    return Array.from(gallery.querySelectorAll('img'))
+      .map((image) => getLightboxTarget(image))
+      .filter(Boolean)
+      .map(describeItem);
+  }
+
+  function showItem(index) {
+    if (!activeItems.length) return;
+    activeIndex = (index + activeItems.length) % activeItems.length;
+    const item = activeItems[activeIndex];
+    const image = document.querySelector('[data-portal-lightbox-image]');
+    const caption = document.querySelector('[data-portal-lightbox-caption]');
+    const counter = document.querySelector('[data-portal-lightbox-counter]');
+    const source = document.querySelector('[data-portal-lightbox-source]');
+    const previous = document.querySelector('[data-portal-lightbox-previous]');
+    const next = document.querySelector('[data-portal-lightbox-next]');
+    if (!image || !caption || !counter || !source || !previous || !next) return;
+
+    image.src = item.imageUrl;
+    image.alt = item.thumbnail.alt;
+    caption.textContent = item.caption;
+    caption.hidden = !item.caption;
+    counter.textContent = `${activeIndex + 1} / ${activeItems.length}`;
+    counter.hidden = activeItems.length < 2;
+    previous.hidden = activeItems.length < 2;
+    next.hidden = activeItems.length < 2;
+    if (item.sourceUrl) {
+      source.href = item.sourceUrl;
+      source.hidden = false;
+    } else {
+      source.removeAttribute('href');
+      source.hidden = true;
+    }
+  }
+
+  function closeImageLightbox() {
+    const modal = document.querySelector('[data-portal-lightbox]');
+    const image = document.querySelector('[data-portal-lightbox-image]');
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.documentElement.classList.remove('portal-lightbox-open');
+    if (image) image.removeAttribute('src');
+    activeItems = [];
+    const trigger = document.querySelector('[data-portal-lightbox-trigger]');
+    trigger?.removeAttribute('data-portal-lightbox-trigger');
+    trigger?.focus();
+  }
+
+  function openImageLightbox(target) {
+    const resolved = getLightboxTarget(target);
+    if (!resolved) return false;
+
+    const modal = document.querySelector('[data-portal-lightbox]');
+    const closeButton = document.querySelector('[data-portal-lightbox-close]');
+    if (!modal || !closeButton) return false;
+
+    document.querySelector('[data-portal-lightbox-trigger]')?.removeAttribute('data-portal-lightbox-trigger');
+    resolved.trigger.setAttribute('data-portal-lightbox-trigger', '');
+    activeItems = getGalleryItems(resolved);
+    activeIndex = Math.max(0, activeItems.findIndex((item) => item.trigger === resolved.trigger));
+    showItem(activeIndex);
+    modal.hidden = false;
+    document.documentElement.classList.add('portal-lightbox-open');
+    closeButton.focus();
+    return true;
+  }
+
+  function prepareLightboxImages() {
+    document.querySelectorAll('main img').forEach((image) => {
+      const resolved = getLightboxTarget(image);
+      if (!resolved) return;
+      resolved.trigger.classList.add('portal-lightbox-trigger');
+      if (resolved.trigger === image) {
+        image.tabIndex = 0;
+        image.setAttribute('role', 'button');
+      }
+      resolved.trigger.setAttribute('aria-label', image.alt ? `Увеличить изображение: ${image.alt}` : 'Увеличить изображение');
+    });
+  }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.closest('[data-portal-lightbox-close]') || target.matches('[data-portal-lightbox]'))) {
+        closeImageLightbox();
+        return;
+      }
+      if (target instanceof HTMLElement && target.closest('[data-portal-lightbox-previous]')) {
+        showItem(activeIndex - 1);
+        return;
+      }
+      if (target instanceof HTMLElement && target.closest('[data-portal-lightbox-next]')) {
+        showItem(activeIndex + 1);
+        return;
+      }
+      if (!(event instanceof MouseEvent) || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      if (target instanceof HTMLElement && openImageLightbox(target)) event.preventDefault();
+    }, { signal });
+
+    document.addEventListener('keydown', (event) => {
+      const modal = document.querySelector('[data-portal-lightbox]');
+      if (event.key === 'Escape') {
+        closeImageLightbox();
+        return;
+      }
+      if (modal && !modal.hidden && event.key === 'ArrowLeft') {
+        event.preventDefault();
+        showItem(activeIndex - 1);
+        return;
+      }
+      if (modal && !modal.hidden && event.key === 'ArrowRight') {
+        event.preventDefault();
+        showItem(activeIndex + 1);
+        return;
+      }
+      if ((event.key === 'Enter' || event.key === ' ') && event.target instanceof HTMLImageElement && event.target.classList.contains('portal-lightbox-trigger')) {
+        event.preventDefault();
+        openImageLightbox(event.target);
+      }
+    }, { signal });
+    document.addEventListener('pointerdown', (event) => {
+      if (event.target instanceof HTMLElement && event.target.closest('[data-portal-lightbox-stage]')) pointerStartX = event.clientX;
+    }, { signal });
+    document.addEventListener('pointerup', (event) => {
+      if (pointerStartX === null) return;
+      const distance = event.clientX - pointerStartX;
+      pointerStartX = null;
+      if (Math.abs(distance) < 48 || activeItems.length < 2) return;
+      showItem(activeIndex + (distance < 0 ? 1 : -1));
+    }, { signal });
+    document.addEventListener('astro:page-load', prepareLightboxImages, { signal });
+    document.addEventListener('astro:before-swap', closeImageLightbox, { signal });
+
+  prepareLightboxImages();
+})();
+</script><script type="module" src="/reality413universe-pages/_astro/SiteHeader.astro_astro_type_script_index_0_lang.Bm5L5_QR.js"></script></header><nav class="sidebar print:hidden astro-gqpr5s5a" aria-label="Main"><starlight-menu-button class="print:hidden astro-vvx7mffu"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-vvx7mffu"><svg aria-hidden="true" class="open-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"></path></svg><svg aria-hidden="true" class="close-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"></path></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-gqpr5s5a"><div class="sidebar-content sl-flex astro-gqpr5s5a"><sl-sidebar-state-persist data-hash="0000000" class="astro-f5yvicm7"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-ojxuodky"></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-b5gddk54"><div class="social-icons astro-b5gddk54"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"></path></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">Dark</option><option value="light" class="astro-r2p65idu">Light</option><option value="auto" selected="" class="astro-r2p65idu">Auto</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"></path></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></div></div></nav><div class="main-frame astro-gqpr5s5a"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-abfeecmu"><aside class="right-sidebar-container print:hidden astro-abfeecmu"><div class="right-sidebar astro-abfeecmu"><div class="lg:sl-hidden astro-q5mffni3"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-5ulgm6bh"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-5ulgm6bh"><details id="starlight__mobile-toc" class="astro-5ulgm6bh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-5ulgm6bh"><span class="toggle sl-flex astro-5ulgm6bh">On this page<svg aria-hidden="true" class="caret astro-5ulgm6bh astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"></path></svg></span><span class="display-current astro-5ulgm6bh"></span></summary><div class="dropdown astro-5ulgm6bh"><ul class="isMobile astro-cxyftcne" style="--depth: 0;"><li style="--depth: 0;" class="astro-cxyftcne"><a href="#_top" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">Overview</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/reality413universe-pages/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.BcSo_yiZ.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-q5mffni3"><div class="sl-container astro-q5mffni3"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-cxyftcne" style="--depth: 0;"><li style="--depth: 0;" class="astro-cxyftcne"><a href="#_top" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">Overview</span></a></li></ul></nav></starlight-toc><script type="module" src="/reality413universe-pages/_astro/TableOfContents.astro_astro_type_script_index_0_lang.Csloo1VZ.js"></script></div></div></div></aside><div class="main-pane astro-abfeecmu"><main data-pagefind-body="" class="astro-vdxcvpsm" lang="en" dir="ltr"><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><h1 id="_top" class="astro-pzp5z7vx">Термосканер</h1></div></div><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><div class="sl-markdown-content"><aside class="wiki-import-note wiki-import-note--placeholder"><strong>Временный макет раздела.</strong> Материалы ниже скопированы из Wiki «Код доступа: РАЙ Ремастер», чтобы оценить структуру и наполнение. Они пока не относятся к игре «Власть Закона: Полицейские истории».</aside>
+<div class="legacy-wiki-content">
+<div class="flex flex--between wiki eq">
+  <div class="item no-link lpic"><img src="/reality413universe-pages/images/wiki/paradise-cracked-remaster/equipment/other/termoscanner.jpg" alt=""></div>
+  <div class="item info">
+    <table>
+      <tbody><tr><td>Необходимо интеллекта</td><td>10</td></tr>
+      <tr><td>Вес</td><td>1.0 кг</td></tr>
+      <tr><td>Эффект</td><td>0</td></tr>
+      <tr><td>Тип эффекта</td><td>-</td></tr>
+      <tr><td>Заряд</td><td>0</td></tr>
+      <tr><td>Радиус</td><td>10 м</td></tr>
+      <tr><td>Базовая стоимость</td><td>300 кредитов</td></tr>
+    </tbody></table>
+  </div>
+  <div class="item info description content c-content"><h4>Описание</h4><p>Сканер, позволяющий специальным излучением просвечивать всю территорию в радиусе 3 метров, в том числе за стенами, выявляя все живые существа.</p></div>
+</div>
+</div>
+</div><div class="starlight-portal-footer astro-rgwewuyk"><div class="site-ending" data-music-reactive-surface="footer" data-language-storage="reality413-language" data-supported-locales="ru,en"><footer class="site-footer" data-portal-ending-level="footer" data-i18n-scope=""><div class="footer-partners" aria-label="Universe websites"><a class="footer-partner footer-partner--cats" href="https://www.catswhoplay.com/" target="_blank" rel="noopener noreferrer" aria-label="Cats Who Play" title="Cats Who Play"><img src="/reality413universe-pages/images/partners/cats-who-play.webp" alt="" loading="lazy" data-viewport-image-loading="true" data-footer-partner-image="true" data-music-target="footer.partners" data-music-instance-phase="0" aria-hidden="true" decoding="async" width="46" height="46"></a><a class="footer-partner" href="https://reality413.ru/" target="_blank" rel="noopener noreferrer" aria-label="Official Reality 4.13 portal" title="Official Reality 4.13 portal"><img src="/reality413universe-pages/images/partners/reality413-original.svg" alt="" loading="lazy" data-viewport-image-loading="true" data-footer-partner-image="true" data-music-target="footer.partners" data-music-instance-phase="0.333" aria-hidden="true" decoding="async" width="46" height="46"></a><div class="footer-steam-cluster"><a class="footer-partner" href="http://paradisecracked.ru/" target="_blank" rel="noopener noreferrer" aria-label="Paradise Cracked Remaster" title="Paradise Cracked Remaster"><img src="/reality413universe-pages/images/partners/paradise-cracked.webp" alt="" loading="lazy" data-viewport-image-loading="true" data-footer-partner-image="true" data-music-target="footer.partners" data-music-instance-phase="0.666" aria-hidden="true" decoding="async" width="46" height="46"></a><a class="footer-steam-button" href="/reality413universe-pages/en/steam/" aria-label="Investigation into bringing Reality 4.13 games to Steam" title="Bring Reality 4.13 back to Steam"><svg width="1em" height="1em" data-music-target="footer.partners" data-music-instance-phase="0.833" data-icon="simple-icons:steam"><symbol id="ai:simple-icons:steam" viewBox="0 0 24 24"><path fill="currentColor" d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658a3.4 3.4 0 0 1 1.912-.59q.094.001.188.006l2.861-4.142V8.91a4.53 4.53 0 0 1 4.524-4.524c2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911l.004.159a3.39 3.39 0 0 1-3.39 3.396a3.41 3.41 0 0 1-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0M7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25a2.551 2.551 0 0 0 3.337-3.324a2.547 2.547 0 0 0-3.255-1.413l1.523.63a1.878 1.878 0 0 1-1.445 3.467zm11.415-9.303a3.02 3.02 0 0 0-3.015-3.015a3.015 3.015 0 1 0 3.015 3.015m-5.273-.005a2.264 2.264 0 1 1 4.531 0a2.267 2.267 0 0 1-2.266 2.265a2.264 2.264 0 0 1-2.265-2.265"></path></symbol><use href="#ai:simple-icons:steam"></use></svg></a></div></div><div class="footer-meta"><p data-music-target="footer.meta">Reality 4.13 © Vitaly Shutov. All rights reserved.</p></div><nav class="social-links" aria-label="Social networks"><button class="social-link" type="button" aria-label="ВКонтакте" title="ВКонтакте"><svg width="1em" height="1em" data-music-target="footer.social" data-music-instance-phase="0" data-icon="simple-icons:vk"><symbol id="ai:simple-icons:vk" viewBox="0 0 24 24"><path fill="currentColor" d="m9.489.004l.729-.003h3.564l.73.003l.914.01l.433.007l.418.011l.403.014l.388.016l.374.021l.36.025l.345.03l.333.033c1.74.196 2.933.616 3.833 1.516s1.32 2.092 1.516 3.833l.034.333l.029.346l.025.36l.02.373l.025.588l.012.41l.013.644l.009.915l.004.98l-.001 3.313l-.003.73l-.01.914l-.007.433l-.011.418l-.014.403l-.016.388l-.021.374l-.025.36l-.03.345l-.033.333c-.196 1.74-.616 2.933-1.516 3.833s-2.092 1.32-3.833 1.516l-.333.034l-.346.029l-.36.025l-.373.02l-.588.025l-.41.012l-.644.013l-.915.009l-.98.004l-3.313-.001l-.73-.003l-.914-.01l-.433-.007l-.418-.011l-.403-.014l-.388-.016l-.374-.021l-.36-.025l-.345-.03l-.333-.033c-1.74-.196-2.933-.616-3.833-1.516S.367 20.221.171 18.48l-.034-.333l-.029-.346l-.025-.36l-.02-.373l-.025-.588l-.012-.41l-.013-.644l-.009-.915l-.004-.98l.001-3.313l.003-.73l.01-.914l.007-.433l.011-.418l.014-.403l.016-.388l.021-.374l.025-.36l.03-.345l.033-.333c.196-1.74.616-2.933 1.516-3.833S3.779.367 5.52.171l.333-.034l.346-.029l.36-.025l.373-.02l.588-.025l.41-.012l.644-.013zM6.79 7.3H4.05c.13 6.24 3.25 9.99 8.72 9.99h.31v-3.57c2.01.2 3.53 1.67 4.14 3.57h2.84c-.78-2.84-2.83-4.41-4.11-5.01c1.28-.74 3.08-2.54 3.51-4.98h-2.58c-.56 1.98-2.22 3.78-3.8 3.95V7.3H10.5v6.92c-1.6-.4-3.62-2.34-3.71-6.92"></path></symbol><use href="#ai:simple-icons:vk"></use></svg></button><button class="social-link" type="button" aria-label="Telegram" title="Telegram"><svg width="1em" height="1em" data-music-target="footer.social" data-music-instance-phase="0.2" data-icon="simple-icons:telegram"><symbol id="ai:simple-icons:telegram" viewBox="0 0 24 24"><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024q-.159.037-5.061 3.345q-.72.495-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789q.04-.324.893-.663q5.247-2.286 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635"></path></symbol><use href="#ai:simple-icons:telegram"></use></svg></button><button class="social-link" type="button" aria-label="YouTube" title="YouTube"><svg width="1em" height="1em" data-music-target="footer.social" data-music-instance-phase="0.4" data-icon="simple-icons:youtube"><symbol id="ai:simple-icons:youtube" viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814M9.545 15.568V8.432L15.818 12z"></path></symbol><use href="#ai:simple-icons:youtube"></use></svg></button><button class="social-link" type="button" aria-label="GitHub" title="GitHub"><svg width="1em" height="1em" data-music-target="footer.social" data-music-instance-phase="0.6" data-icon="simple-icons:github"><symbol id="ai:simple-icons:github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></symbol><use href="#ai:simple-icons:github"></use></svg></button><button class="social-link" type="button" aria-label="Discord" title="Discord"><svg width="1em" height="1em" data-music-target="footer.social" data-music-instance-phase="0.8" data-icon="simple-icons:discord"><symbol id="ai:simple-icons:discord" viewBox="0 0 24 24"><path fill="currentColor" d="M20.317 4.37a19.8 19.8 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.3 18.3 0 0 0-5.487 0a13 13 0 0 0-.617-1.25a.08.08 0 0 0-.079-.037A19.7 19.7 0 0 0 3.677 4.37a.1.1 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.08.08 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.08.08 0 0 0 .084-.028a14 14 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13 13 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10 10 0 0 0 .372-.292a.07.07 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .078.01q.181.149.373.292a.077.077 0 0 1-.006.127a12.3 12.3 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.08.08 0 0 0 .084.028a19.8 19.8 0 0 0 6.002-3.03a.08.08 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03M8.02 15.33c-1.182 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418m7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418"></path></symbol><use href="#ai:simple-icons:discord"></use></svg></button><a class="social-link footer-language-switch" href="/reality413universe-pages/ru/wiki/games/cops-2170-police-stories/equipment_other/termoscanner/" data-language-switch="" aria-label="Switch the portal to Русский" title="Русский" data-language-target="ru" lang="ru" hreflang="ru"><svg width="1em" height="1em" data-music-target="footer.social" data-music-instance-phase="0.75" data-icon="lucide:languages"><symbol id="ai:lucide:languages" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 8l6 6m-7 0l6-6l2-3M2 5h12M7 2h1m14 20l-5-10l-5 10m2-4h6"></path></symbol><use href="#ai:lucide:languages"></use></svg><span data-language-code="" data-music-target="footer.social" data-music-instance-phase="0.875">EN</span></a></nav></footer></div><script type="module">var e;function t(){e?.abort(),e=new AbortController;let{signal:t}=e,n=0;function r(){n=0,document.querySelectorAll(`[data-viewport-image-loading]`).forEach(e=>{let t=e.getBoundingClientRect();e.loading=e.offsetParent!==null&&t.bottom>0&&t.top<window.innerHeight?`eager`:`lazy`})}function i(){n||=requestAnimationFrame(r)}window.addEventListener(`scroll`,i,{passive:!0,signal:t}),window.addEventListener(`resize`,i,{signal:t}),t.addEventListener(`abort`,()=>cancelAnimationFrame(n),{once:!0}),i()}document.addEventListener(`astro:page-load`,t),t();</script><script type="module" src="/reality413universe-pages/_astro/SiteFooter.astro_astro_type_script_index_0_lang.C7MFPaCb.js"></script></div></div></div></main></div></div></div></div></body></html>

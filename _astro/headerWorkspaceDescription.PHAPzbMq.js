@@ -1,0 +1,1 @@
+function e(e,t){if(!e)return;let n=e.querySelector(`:scope > [data-header-description-label]`);n||(n=document.createElement(`span`),n.dataset.headerDescriptionLabel=``,e.replaceChildren(n)),n.textContent!==t&&(n.textContent=t)}export{e as t};

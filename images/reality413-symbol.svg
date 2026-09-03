@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title description">
+  <title id="title">Символ Реальности 4.13</title>
+  <desc id="description">Светящийся кристалл, окружённый пересекающимися орбитами</desc>
+  <defs>
+    <linearGradient id="orbit" x1="14" y1="26" x2="114" y2="99" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#647dff"/>
+      <stop offset=".48" stop-color="#f4f7ff"/>
+      <stop offset="1" stop-color="#9d58ff"/>
+    </linearGradient>
+    <linearGradient id="crystal" x1="50" y1="34" x2="77" y2="111" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset=".22" stop-color="#b9d5ff"/>
+      <stop offset=".56" stop-color="#6179ec"/>
+      <stop offset="1" stop-color="#332a8d"/>
+    </linearGradient>
+    <linearGradient id="facetLeft" x1="48" y1="45" x2="63" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#eef6ff"/>
+      <stop offset=".48" stop-color="#647bdd"/>
+      <stop offset="1" stop-color="#231a71"/>
+    </linearGradient>
+    <linearGradient id="facetRight" x1="80" y1="44" x2="64" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d8e4ff"/>
+      <stop offset=".45" stop-color="#765dd5"/>
+      <stop offset="1" stop-color="#3b238a"/>
+    </linearGradient>
+    <radialGradient id="core">
+      <stop stop-color="#fff"/>
+      <stop offset=".24" stop-color="#dff1ff"/>
+      <stop offset=".62" stop-color="#7fa3ff" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#7f5cff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="2.6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g fill="none" stroke="url(#orbit)" stroke-linecap="round">
+    <ellipse cx="64" cy="58" rx="51" ry="18" stroke-width="2.1" transform="rotate(-8 64 58)"/>
+    <ellipse cx="64" cy="58" rx="49" ry="17" stroke-width="1.75" transform="rotate(57 64 58)"/>
+    <ellipse cx="64" cy="58" rx="48" ry="16" stroke-width="1.55" transform="rotate(116 64 58)"/>
+  </g>
+
+  <g filter="url(#glow)">
+    <circle cx="21.5" cy="43" r="3" fill="#92a8ff"/>
+    <circle cx="101.5" cy="34" r="2.8" fill="#f7f9ff"/>
+    <circle cx="91" cy="83" r="2.7" fill="#9f70ff"/>
+    <circle cx="42" cy="94" r="2.3" fill="#d7e6ff"/>
+  </g>
+
+  <circle cx="64" cy="57" r="22" fill="url(#core)" opacity=".72" filter="url(#glow)"/>
+
+  <g stroke="#dce8ff" stroke-linejoin="round" stroke-width="1.15" filter="url(#glow)">
+    <path d="M64 31 81 50 74 76 64 113 53 76 47 50Z" fill="url(#crystal)"/>
+    <path d="M64 31 64 62 47 50Z" fill="#f4f8ff" fill-opacity=".88"/>
+    <path d="M64 31 81 50 64 62Z" fill="#a8baff" fill-opacity=".9"/>
+    <path d="M47 50 64 62 53 76Z" fill="url(#facetLeft)"/>
+    <path d="M81 50 74 76 64 62Z" fill="url(#facetRight)"/>
+    <path d="M53 76 64 62 64 113Z" fill="#5268cb"/>
+    <path d="M74 76 64 113 64 62Z" fill="#392578"/>
+  </g>
+
+  <g fill="#fff" filter="url(#glow)">
+    <circle cx="64" cy="56" r="3.6"/>
+    <circle cx="69" cy="47" r="1.4"/>
+    <circle cx="57" cy="66" r="1.2"/>
+  </g>
+</svg>

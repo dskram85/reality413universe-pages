@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <genre>sf_cyberpunk</genre>
+      <author><nickname>Евгений Агешкин</nickname></author>
+      <book-title>Агент СБС</book-title>
+      <annotation><p>История агента СБС со светлых времен Системы. Говорят,что агенты СБС всесильны и всемощны. Но это разве правда?Никогда я,пожалуй, не сказал бы так. Да,полномочий у агентов СБС великое…</p></annotation>
+      <date value="2015-05-28">2015-05-28</date>
+      <lang>ru</lang>
+    </title-info>
+    <document-info>
+      <author><nickname>Вселенная Реальность 4.13</nickname></author>
+      <program-used>reality413portal community importer</program-used>
+      <date value="2026-08-08">2026-08-08</date>
+      <src-url>https://www.reality413.com/index.php/thinking/311---3</src-url>
+      <id>reality413-community-mysl-311---3</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <title><p>Агент СБС</p></title>
+    <section>
+      <p>История агента СБС со светлых времен Системы.</p>
+      <p>Говорят,что агенты СБС всесильны и всемощны. Но это разве правда? Никогда я,пожалуй, не сказал бы так. Да,полномочий у агентов СБС великое множество,их так много,что не пересчесть. Но агенты СБС тоже смертны,как и обычные люди класса Д.Оружие,импланты,машины,помощники,специальные задания - такой представляется жизнь агента СБС каким-нибудь гражданам В класса. Ну, а если я скажу,что это не так? Хм,огорчится ли кто-нибудь или может я разрушу чьи-то фантазии? Да плевать на мнение этих людей. Особенно когда ты не помнишь себя.</p>
+    </section>
+  </body>
+</FictionBook>

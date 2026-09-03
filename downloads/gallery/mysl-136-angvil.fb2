@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <genre>sf_cyberpunk</genre>
+      <author><nickname>Миха Кузин</nickname></author>
+      <book-title>AngVil</book-title>
+      <annotation><p>Всем любителям реальности 4.13 привет) Я являюсь большим поклонником сего творения. Код Доступа Рай - не просто игра, это вселенная, полноценный мир, в который всегда так хочется…</p></annotation>
+      <date value="2012-06-05">2012-06-05</date>
+      <lang>ru</lang>
+    </title-info>
+    <document-info>
+      <author><nickname>Вселенная Реальность 4.13</nickname></author>
+      <program-used>reality413portal community importer</program-used>
+      <date value="2026-08-08">2026-08-08</date>
+      <src-url>https://www.reality413.com/index.php/thinking/136-angvil</src-url>
+      <id>reality413-community-mysl-136-angvil</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <title><p>AngVil</p></title>
+    <section>
+      <p>Всем любителям реальности 4.13 привет) Я являюсь большим поклонником сего творения. Код Доступа Рай - не просто игра, это вселенная, полноценный мир, в который всегда так хочется вернуться.. В свободное от работы время я переодически пописываю музычку, вдохновленную этой замечательной игрой. Не знаю как выложить ее здесь, могу только выложить ссыль на группу в контакте (http://vk.com/public25496538) С радостью всех жду в гости =)</p>
+    </section>
+  </body>
+</FictionBook>

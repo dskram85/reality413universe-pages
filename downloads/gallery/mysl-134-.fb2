@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <genre>sf_cyberpunk</genre>
+      <author><nickname>Виталий Шутов</nickname></author>
+      <book-title>Время...</book-title>
+      <annotation><p>Привет всем. Сильно извиняюсь за отсутствие обновлений последние две недели, просто у меня отпуск, а ещё и переезд, который как известно хуже потопа. Времени нет ну совсем совсем. Своей…</p></annotation>
+      <date value="2012-05-23">2012-05-23</date>
+      <lang>ru</lang>
+    </title-info>
+    <document-info>
+      <author><nickname>Вселенная Реальность 4.13</nickname></author>
+      <program-used>reality413portal community importer</program-used>
+      <date value="2026-08-08">2026-08-08</date>
+      <src-url>https://www.reality413.com/index.php/thinking/134-</src-url>
+      <id>reality413-community-mysl-134-</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <title><p>Время...</p></title>
+    <section>
+      <p>Привет всем.</p>
+      <p>Сильно извиняюсь за отсутствие обновлений последние две недели, просто у меня отпуск, а ещё и переезд, который как известно хуже потопа. Времени нет ну совсем совсем. Своей череды ждут несколько новых глав Хроник защитника ферм, новый рассказ из Крысиных историй (Вам ведь правда интересно как Бик-14 попал в плен к профсоюзу терраформеров и сбежал?), и обещанная техника Тёмных времён в соответсвующий раздел. И да, я помню про обещание выложить моды, музыку от Angvil и версии КДР и ВЗ без привязок к дискам. Терпение только терпение, всё будет! Никто ни на кого не забил! ))</p>
+    </section>
+  </body>
+</FictionBook>

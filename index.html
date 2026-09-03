@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><script>(() => {
+  const definitions = [{"code":"ru","browserPrefixes":["ru"]},{"code":"en","browserPrefixes":["en"]}];
+  const supported = definitions.map(({ code }) => code);
+  let saved = '';
+  try { saved = localStorage.getItem("reality413-language") || ''; } catch {}
+  const detected = (navigator.languages?.[0] || navigator.language || '').toLowerCase();
+  const detectedLocale = definitions.find(({ browserPrefixes }) => browserPrefixes.some((prefix) => detected === prefix || detected.startsWith(prefix + '-')))?.code;
+  const locale = supported.includes(saved) ? saved : detectedLocale || "en";
+  const slash = String.fromCharCode(47);
+  const baseSegment = "reality413universe-pages";
+  const root = location.origin + (baseSegment ? slash + baseSegment : '') + slash;
+  location.replace(new URL(locale + slash + "", root).href);
+})();</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><meta name="reality413-document" content="entry"><meta name="description" content="Choose the Reality 4.13 Universe portal language."><meta name="theme-color" content="#080810"><link rel="icon" href="/reality413universe-pages/favicon.svg" type="image/svg+xml"><title>Reality 4.13 Universe</title><style>
+      :root { color-scheme:dark; font-family:Inter,system-ui,sans-serif; background:#050507; }
+      body { min-height:100vh; margin:0; display:grid; place-items:center; color:#d8d5de; background:radial-gradient(circle at 50% 36%,#211528 0,transparent 36%),#050507; }
+      main { width:min(520px,calc(100% - 40px)); padding:42px; border:1px solid rgb(196 61 164 / .42); background:rgb(8 8 12 / .86); text-align:center; box-shadow:0 22px 80px rgb(0 0 0 / .58); }
+      p { color:#aaa7a2; line-height:1.6; }
+      nav { margin-top:28px; display:flex; justify-content:center; gap:14px; }
+      a { min-width:112px; padding:12px 18px; color:#d8d5de; border:1px solid rgb(216 213 222 / .3); text-decoration:none; }
+      a:hover,a:focus-visible { color:#fff; border-color:#c43da4; outline:none; }
+    </style><script type="module" src="/reality413universe-pages/_astro/page.BJyszQh4.js"></script><link rel="canonical" href="https://dskram85.github.io/reality413universe-pages/"><link rel="alternate" hreflang="ru" href="https://dskram85.github.io/reality413universe-pages/ru/"><link rel="alternate" hreflang="en" href="https://dskram85.github.io/reality413universe-pages/en/"><link rel="alternate" hreflang="x-default" href="https://dskram85.github.io/reality413universe-pages/"></head><body><main><h1>REALITY 4.13 UNIVERSE</h1><p>The portal will open in your saved or browser language.</p><nav aria-label="Choose language"><a href="/reality413universe-pages/ru/" lang="ru">Русский</a><a href="/reality413universe-pages/en/" lang="en">English</a></nav><noscript><p>Choose a language to continue.</p></noscript></main></body></html>
